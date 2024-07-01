@@ -1,5 +1,8 @@
+using System.Collections.Generic;
 using Script.Static;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Script.Controller {
     public class ObjectControl : MonoBehaviour {
@@ -10,6 +13,8 @@ namespace Script.Controller {
 
         //--------------------------------------------------------------------------------------------------------------------------
 
+        public ComponentControl componentControl;
+        public Canvas canvas;
         private Camera _mainCamera;
         private Transform _selectedObject;
         private float _distance;
@@ -62,6 +67,7 @@ namespace Script.Controller {
 
                 _isHoldingMouse = false;
                 _isMovingMouse = false;
+                _isHoldingObject = false;
             }
         }
 
@@ -74,18 +80,22 @@ namespace Script.Controller {
 
                 if (_selectedObject != hit.transform || _selectedObject is null) {
                     Outline(_selectedObject, false);
-                    Outline(hit.transform, true);
+                    componentControl.DisableComponents(_selectedObject);
 
                     _selectedObject = hit.transform;
+                    Outline(_selectedObject, true);
+                    componentControl.EnableComponents(_selectedObject);
                 }
             }
             else {
+                if (IsPointerOverUI(Tags.ComponentPanel)) return;
                 DeselectObject();
             }
         }
 
         private void DeselectObject() {
             if (_selectedObject is null) return;
+            componentControl.DisableComponents(_selectedObject);
             Outline(_selectedObject, false);
             _selectedObject = null;
         }
@@ -146,6 +156,24 @@ namespace Script.Controller {
         private void Outline(Transform selectedObject, bool enabled) {
             if (selectedObject is not null)
                 selectedObject.GetComponent<Outline>().enabled = enabled;
+        }
+
+        private bool IsPointerOverUI(string tag) {
+            PointerEventData eventData = new PointerEventData(EventSystem.current);
+            eventData.position = Input.mousePosition;
+
+            List<RaycastResult> results = new List<RaycastResult>();
+
+            GraphicRaycaster raycaster = canvas.GetComponent<GraphicRaycaster>();
+            raycaster.Raycast(eventData, results);
+
+            foreach (RaycastResult result in results) {
+                if (result.gameObject.CompareTag(tag)) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
     }
