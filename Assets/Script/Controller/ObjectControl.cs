@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using Script.Enum;
 using Script.Static;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Action = Script.Enum.Action;
 
 namespace Script.Controller {
     public class ObjectControl : MonoBehaviour {
@@ -14,8 +16,9 @@ namespace Script.Controller {
         //--------------------------------------------------------------------------------------------------------------------------
 
         public ComponentControl componentControl;
+        public ControlPanel controlPanel;
         public Canvas canvas;
-        private Camera _mainCamera;
+        public Camera mainCamera;
         private Transform _selectedObject;
         private float _distance;
         private Vector3 _offset;
@@ -28,10 +31,6 @@ namespace Script.Controller {
         private Vector3 _mouseDownPosition;
         private bool _isHoldingMouse;
         private bool _isMovingMouse;
-
-        private void Start() {
-            _mainCamera = GetComponent<Camera>();
-        }
 
         private void Update() {
             if (Input.GetKeyDown(KeyCode.Escape)) {
@@ -50,7 +49,16 @@ namespace Script.Controller {
             if (Input.GetMouseButton(0)) {
                 if (IsMovingMouse()) {
                     _isMovingMouse = true;
-                    MoveObject();
+                    switch (controlPanel.GetControl().Action) {
+                        case Action.Position: {
+                            MoveObject();
+                        }
+                            break;
+                        case Action.Rotation: {
+                            RotateObject();
+                        }
+                            break;
+                    }
                 }
                 else {
                     if (IsHoldingMouse()) {
@@ -72,7 +80,7 @@ namespace Script.Controller {
         }
 
         private void SelectObject() {
-            var ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
+            var ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out var hit)) {
                 if (!hit.collider.CompareTag(Tags.Selectable)) return;
 
@@ -88,7 +96,7 @@ namespace Script.Controller {
                 }
             }
             else {
-                if (IsPointerOverUI(Tags.ComponentPanel)) return;
+                if (IsPointerOverUI(Tags.ComponentPanel) || IsPointerOverUI(Tags.ControlPanel)) return;
                 DeselectObject();
             }
         }
@@ -101,11 +109,66 @@ namespace Script.Controller {
         }
 
         private void MoveObject() {
-            if (_isHoldingObject) {
-                var screenPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, _distance);
-                var pos = _mainCamera.ScreenToWorldPoint(screenPosition);
-                _selectedObject.position = pos + _offset;
+            if (!_isHoldingObject) return;
+
+            var mousePosition = Input.mousePosition;
+            mousePosition.z = _distance;
+            var worldPos = mainCamera.ScreenToWorldPoint(mousePosition);
+            var newPosition = _selectedObject.position;
+
+            switch (controlPanel.GetControl().Axis) {
+                case Axis.X: {
+                    newPosition.x = worldPos.x + _offset.x;
+                }
+                    break;
+                case Axis.Y: {
+                    newPosition.y = worldPos.y + _offset.y;
+                }
+                    break;
+                case Axis.Z: {
+                    newPosition.z = worldPos.z + _offset.z;
+                }
+                    break;
+                case Axis.Free: {
+                    var screenPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, _distance);
+                    var pos = mainCamera.ScreenToWorldPoint(screenPosition);
+                    _selectedObject.position = pos + _offset;
+                    return;
+                }
             }
+
+            _selectedObject.position = newPosition;
+        }
+
+        private void RotateObject() {
+            if (!_isHoldingObject) return;
+            float mouse = 0f;
+            Vector3 rotate = Vector3.zero;
+            switch (controlPanel.GetControl().Axis) {
+                case Axis.X: {
+                    mouse = Input.GetAxis("Mouse Y");
+                    rotate = Vector3.left;
+                }
+                    break;
+                case Axis.Y: {
+                    mouse = Input.GetAxis("Mouse X");
+                    rotate = Vector3.up;
+                }
+                    break;
+                case Axis.Z: {
+                    mouse = Input.GetAxis("Mouse Y");
+                    rotate = Vector3.forward;
+                }
+                    break;
+                case Axis.Free: {
+                    float mouseX = Input.GetAxis("Mouse X") * 2;
+                    float mouseY = Input.GetAxis("Mouse Y") * 2;
+                    _selectedObject.Rotate(mouseY, -mouseX, 0, Space.World);
+                }
+                    break;
+            }
+
+            _selectedObject.Rotate(rotate, -mouse * 2f, Space.World);
         }
 
         /// <summary>
@@ -115,10 +178,10 @@ namespace Script.Controller {
         private void SetDistance() {
             if (_selectedObject is null) return;
             var position = _selectedObject.position;
-            var screenPoint = _mainCamera.WorldToScreenPoint(position);
+            var screenPoint = mainCamera.WorldToScreenPoint(position);
             _distance = screenPoint.z;
             _offset = position -
-                      _mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y,
+                      mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y,
                           _distance));
         }
 
@@ -126,7 +189,7 @@ namespace Script.Controller {
         /// Checks if the selected object has been hit.
         /// </summary>
         private void SetHoldingObject() {
-            var ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
+            var ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out var hit)) {
                 if (hit.transform == _selectedObject) {
                     _isHoldingObject = true;

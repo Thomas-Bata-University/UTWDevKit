@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Selectable
   - ComponentPanel
+  - ControlPanel
   layers:
   - Default
   - TransparentFX

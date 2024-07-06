@@ -14,8 +14,9 @@ namespace Script.Manager {
 
         //--------------------------------------------------------------------------------------------------------------------------
 
-        private const string ControlFile = "controlFile";
+        private const string ControlFile = "controlFile"; //File for UTW project confirmation
 
+        #region Create
         public void CreateProject() {
             FileBrowser.ShowSaveDialog((paths) => { OnProjectCreate(paths[0]); },
                 () => { Debug.Log("Canceled"); },
@@ -39,7 +40,9 @@ namespace Script.Manager {
                 Debug.LogError("Project with this name already exists");
             }
         }
+        #endregion
 
+        #region Open
         public void OpenProject() {
             FileBrowser.ShowLoadDialog((paths) => { OnProjectOpen(paths[0]); },
                 () => { Debug.Log("Canceled"); },
@@ -55,6 +58,7 @@ namespace Script.Manager {
                 Debug.LogError("Cannot open. This is not a UTW project.");
             }
         }
+        #endregion
 
     }
 } //END

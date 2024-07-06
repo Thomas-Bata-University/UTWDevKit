@@ -15,6 +15,7 @@ namespace Script.Component {
         protected bool IsObjectMoving;
 
         private Vector3 _lastPosition;
+        private Quaternion _lastRotation;
 
         private void Awake() {
             AwakeImpl();
@@ -23,6 +24,7 @@ namespace Script.Component {
         private void Start() {
             objectTransform = objectInstance.transform;
             _lastPosition = objectTransform.position;
+            _lastRotation = objectTransform.rotation;
 
             StartImpl();
         }
@@ -30,6 +32,10 @@ namespace Script.Component {
         private void Update() {
             if (objectTransform.position != _lastPosition) {
                 _lastPosition = objectTransform.position;
+                IsObjectMoving = true;
+            }
+            else if (objectTransform.rotation != _lastRotation) {
+                _lastRotation = objectTransform.rotation;
                 IsObjectMoving = true;
             }
             else {
