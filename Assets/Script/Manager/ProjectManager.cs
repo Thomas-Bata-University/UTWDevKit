@@ -1,4 +1,7 @@
+using System.IO;
 using Script.Static;
+using SimpleFileBrowser;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,12 +14,46 @@ namespace Script.Manager {
 
         //--------------------------------------------------------------------------------------------------------------------------
 
-        public void CreateNewProject() {
-            Debug.Log("Creating new project.");
-            SceneManager.LoadScene(SceneNames.Editor);
+        private const string ControlFile = "controlFile";
+
+        public void CreateProject() {
+            FileBrowser.ShowSaveDialog((paths) => { OnProjectCreate(paths[0]); },
+                () => { Debug.Log("Canceled"); },
+                FileBrowser.PickMode.FilesAndFolders, false, null, "New Project", "Create new project", "Create");
         }
 
-        public void ImportExistingProject() {
+        private void OnProjectCreate(string path) {
+            if (!Directory.Exists(path)) {
+                Directory.CreateDirectory(path);
+                Debug.Log($"Created {path}");
+
+                string controlFilePath = Path.Combine(path, ControlFile);
+                using (var controlFile = File.CreateText(controlFilePath)) {
+                    controlFile.Write(GUID.Generate());
+                }
+
+                File.SetAttributes(controlFilePath, FileAttributes.Hidden);
+                SceneManager.LoadScene(SceneNames.Editor);
+            }
+            else {
+                Debug.LogError("Project with this name already exists");
+            }
+        }
+
+        public void OpenProject() {
+            FileBrowser.ShowLoadDialog((paths) => { OnProjectOpen(paths[0]); },
+                () => { Debug.Log("Canceled"); },
+                FileBrowser.PickMode.Folders, false, null, null, "Open project", "Open");
+        }
+
+        private void OnProjectOpen(string path) {
+            if (File.Exists(Path.Combine(path, ControlFile))) {
+                Debug.Log("Selected: " + path);
+                SceneManager.LoadScene(SceneNames.Editor);
+            }
+            else {
+                Debug.LogError("Cannot open. This is not a UTW project.");
+            }
         }
 
     }

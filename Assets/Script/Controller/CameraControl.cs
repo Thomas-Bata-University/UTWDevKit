@@ -27,11 +27,12 @@ namespace Script.Controller {
         }
 
         private void Update() {
-            MoveCamera();
             Zoom();
 
-            if (Input.GetMouseButton(1))
+            if (Input.GetMouseButton(1)) {
                 RotateAround(_mainCamera.transform);
+                MoveCamera();
+            }
 
             if (Input.GetMouseButton(2)) {
                 MoveCameraWithMouse();
