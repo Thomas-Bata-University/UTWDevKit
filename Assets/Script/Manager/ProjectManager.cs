@@ -1,4 +1,5 @@
 using System.IO;
+using Script.Enum;
 using Script.Static;
 using SimpleFileBrowser;
 using UnityEditor;
@@ -14,9 +15,24 @@ namespace Script.Manager {
 
         //--------------------------------------------------------------------------------------------------------------------------
 
+        public static ProjectManager Instance;
+
         private const string ControlFile = "controlFile"; //File for UTW project confirmation
 
+        public TankPartType partType = TankPartType.Hull;
+
+        private void Awake() {
+            if (Instance == null) {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else {
+                Destroy(gameObject);
+            }
+        }
+
         #region Create
+
         public void CreateProject() {
             FileBrowser.ShowSaveDialog((paths) => { OnProjectCreate(paths[0]); },
                 () => { Debug.Log("Canceled"); },
@@ -40,9 +56,11 @@ namespace Script.Manager {
                 Debug.LogError("Project with this name already exists");
             }
         }
+
         #endregion
 
         #region Open
+
         public void OpenProject() {
             FileBrowser.ShowLoadDialog((paths) => { OnProjectOpen(paths[0]); },
                 () => { Debug.Log("Canceled"); },
@@ -52,12 +70,14 @@ namespace Script.Manager {
         private void OnProjectOpen(string path) {
             if (File.Exists(Path.Combine(path, ControlFile))) {
                 Debug.Log("Selected: " + path);
+                partType = TankPartType.Hull; //TODO implement logic
                 SceneManager.LoadScene(SceneNames.Editor);
             }
             else {
                 Debug.LogError("Cannot open. This is not a UTW project.");
             }
         }
+
         #endregion
 
     }

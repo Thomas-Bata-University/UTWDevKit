@@ -1,3 +1,4 @@
+using System;
 using Script.Enum;
 using TMPro;
 using UnityEditor;
@@ -28,47 +29,52 @@ namespace Script.Component.Parts {
         }
 
         protected override void StartImpl() {
-            SetPosition(objectTransform.position);
-            SetRotation(objectTransform);
+            SetPosition(objectInstance.position);
+            SetRotation(objectInstance);
 
-            positionX.onSubmit.AddListener(value => OnPositionChanged(value, Axis.X));
-            positionY.onSubmit.AddListener(value => OnPositionChanged(value, Axis.Y));
-            positionZ.onSubmit.AddListener(value => OnPositionChanged(value, Axis.Z));
+            RegisterListeners(positionX, Axis.X, OnPositionChanged);
+            RegisterListeners(positionY, Axis.Y, OnPositionChanged);
+            RegisterListeners(positionZ, Axis.Z, OnPositionChanged);
 
-            rotationX.onSubmit.AddListener(value => OnRotationChanged(value, Axis.X));
-            rotationY.onSubmit.AddListener(value => OnRotationChanged(value, Axis.Y));
-            rotationZ.onSubmit.AddListener(value => OnRotationChanged(value, Axis.Z));
+            RegisterListeners(rotationX, Axis.X, OnRotationChanged);
+            RegisterListeners(rotationY, Axis.Y, OnRotationChanged);
+            RegisterListeners(rotationZ, Axis.Z, OnRotationChanged);
+        }
+
+        void RegisterListeners(TMP_InputField inputField, Axis axis, Action<string, Axis> callback) {
+            inputField.onSubmit.AddListener(value => callback(value, axis));
+            inputField.onDeselect.AddListener(value => callback(value, axis));
         }
 
         protected override void UpdateImpl() {
             if (IsObjectMoving) {
-                SetPosition(objectTransform.position);
-                SetRotation(objectTransform);
+                SetPosition(objectInstance.position);
+                SetRotation(objectInstance);
             }
         }
 
         public void ResetPosition() {
-            objectTransform.position = Vector3.zero;
-            SetPosition(objectTransform.position);
+            objectInstance.position = Vector3.zero;
+            SetPosition(objectInstance.position);
         }
 
         public void ResetRotation() {
-            objectTransform.rotation = Quaternion.Euler(Vector3.zero);
-            SetRotation(objectTransform);
+            objectInstance.rotation = Quaternion.Euler(Vector3.zero);
+            SetRotation(objectInstance);
         }
 
         private void OnPositionChanged(string value, Axis axis) {
-            var position = CalculateTransform(value, axis, objectTransform.position);
+            var position = CalculateTransform(value, axis, objectInstance.position);
 
-            objectTransform.position = position;
+            objectInstance.position = position;
             SetPosition(position);
         }
 
         private void OnRotationChanged(string value, Axis axis) {
-            var rotation = Quaternion.Euler(CalculateTransform(value, axis, objectTransform.rotation.eulerAngles));
+            var rotation = Quaternion.Euler(CalculateTransform(value, axis, objectInstance.rotation.eulerAngles));
 
-            objectTransform.rotation = rotation;
-            SetRotation(objectTransform);
+            objectInstance.rotation = rotation;
+            SetRotation(objectInstance);
         }
 
         private Vector3 CalculateTransform(string value, Axis axis, Vector3 transform) {

@@ -1,3 +1,5 @@
+using Script.Controller;
+using Script.Enum;
 using UnityEngine;
 
 namespace Script.Component {
@@ -7,10 +9,9 @@ namespace Script.Component {
     public abstract class AComponent : MonoBehaviour {
 
         public string componentName;
-        [HideInInspector]
-        public GameObject objectInstance; //Selected object of the component
-        [HideInInspector]
-        public Transform objectTransform;
+        [HideInInspector] public Transform objectInstance; //Selected object of the component
+        [HideInInspector] public ComponentType type;
+        [HideInInspector] public ComponentControl componentControl;
 
         protected bool IsObjectMoving;
 
@@ -22,20 +23,19 @@ namespace Script.Component {
         }
 
         private void Start() {
-            objectTransform = objectInstance.transform;
-            _lastPosition = objectTransform.position;
-            _lastRotation = objectTransform.rotation;
+            _lastPosition = objectInstance.position;
+            _lastRotation = objectInstance.rotation;
 
             StartImpl();
         }
 
         private void Update() {
-            if (objectTransform.position != _lastPosition) {
-                _lastPosition = objectTransform.position;
+            if (objectInstance.position != _lastPosition) {
+                _lastPosition = objectInstance.position;
                 IsObjectMoving = true;
             }
-            else if (objectTransform.rotation != _lastRotation) {
-                _lastRotation = objectTransform.rotation;
+            else if (objectInstance.rotation != _lastRotation) {
+                _lastRotation = objectInstance.rotation;
                 IsObjectMoving = true;
             }
             else {
@@ -50,6 +50,12 @@ namespace Script.Component {
         protected abstract void StartImpl();
 
         protected abstract void UpdateImpl();
+
+        public void Initialize(Transform objectInstance, ComponentType type, ComponentControl componentControl) {
+            this.objectInstance = objectInstance;
+            this.type = type;
+            this.componentControl = componentControl;
+        }
 
     }
 } //END

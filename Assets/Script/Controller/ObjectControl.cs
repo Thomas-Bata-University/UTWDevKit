@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Script.Enum;
 using Script.Static;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Action = Script.Enum.Action;
@@ -14,6 +15,8 @@ namespace Script.Controller {
         public string Notes = "Comment";
 
         //--------------------------------------------------------------------------------------------------------------------------
+
+        public static UnityAction<Transform> OnObjectSelected;
 
         public ComponentControl componentControl;
         public ControlPanel controlPanel;
@@ -90,7 +93,7 @@ namespace Script.Controller {
                     Outline(_selectedObject, false);
                     componentControl.DisableComponents(_selectedObject);
 
-                    _selectedObject = hit.transform;
+                    SetSelectedObject(hit.transform);
                     Outline(_selectedObject, true);
                     componentControl.EnableComponents(_selectedObject);
                 }
@@ -105,7 +108,7 @@ namespace Script.Controller {
             if (_selectedObject is null) return;
             componentControl.DisableComponents(_selectedObject);
             Outline(_selectedObject, false);
-            _selectedObject = null;
+            SetSelectedObject(null);
         }
 
         private void MoveObject() {
@@ -198,6 +201,11 @@ namespace Script.Controller {
                     _isHoldingObject = false;
                 }
             }
+        }
+
+        private void SetSelectedObject(Transform selectedObject) {
+            _selectedObject = selectedObject;
+            OnObjectSelected?.Invoke(selectedObject);
         }
 
         /// <summary>

@@ -1,35 +1,36 @@
 using System;
 using System.Collections.Generic;
+using Script.Enum;
 using UnityEngine;
-using ComponentEnum = Script.Enum.Component;
 
-namespace Script.Manager {
-    [CreateAssetMenu(fileName = "PrefabManager", menuName = "Managers/PrefabManager")]
-    public class ComponentPrefabManager : ScriptableObject {
+namespace Script.TankPart {
+    public abstract class ATankPart : ScriptableObject {
 
         /// <summary>
         /// KEY - Type of the component | VALUE - Component prefab
         /// </summary>
-        private Dictionary<ComponentEnum, GameObject> _prefabDictionary = new();
+        private readonly Dictionary<ComponentType, GameObject> _prefabDictionary = new();
 
         [Serializable]
         public struct PrefabEntry {
 
-            public ComponentEnum componentType;
+            public ComponentType componentType;
             public GameObject prefab;
 
         }
 
         public PrefabEntry[] prefabEntry;
 
-        public void Initialize() {
+        public Dictionary<ComponentType, GameObject> Initialize() {
             foreach (var entry in prefabEntry) {
                 if (!_prefabDictionary.ContainsKey(entry.componentType))
                     _prefabDictionary.Add(entry.componentType, entry.prefab);
             }
+
+            return _prefabDictionary;
         }
 
-        public GameObject GetPrefab(ComponentEnum type) {
+        public GameObject GetPrefab(ComponentType type) {
             if (_prefabDictionary.TryGetValue(type, out GameObject prefab)) {
                 return prefab;
             }
@@ -37,8 +38,8 @@ namespace Script.Manager {
             return null;
         }
 
-        public IEnumerable<GameObject> GetAllPrefabs() {
-            return _prefabDictionary.Values;
+        public Dictionary<ComponentType, GameObject> GetData() {
+            return _prefabDictionary;
         }
 
     }
