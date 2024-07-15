@@ -1,6 +1,7 @@
 using System;
 using Script.Enum;
 using Script.Manager;
+using Script.Part;
 using UnityEngine;
 
 namespace Script.Controller {
@@ -12,15 +13,13 @@ namespace Script.Controller {
 
         //--------------------------------------------------------------------------------------------------------------------------
 
-        public TankPartType partType = ProjectManager.Instance.partType;
-
-        public ComponentControl componentControl;
+        public TaskControl taskControl;
 
         [Serializable]
         public struct PrefabEntry {
 
             public TankPartType partType;
-            public GameObject prefab;
+            public TankPart part;
 
         }
 
@@ -28,9 +27,8 @@ namespace Script.Controller {
 
         private void Start() {
             foreach (var entry in prefabEntry) {
-                if (entry.partType == partType) {
-                    var selectableObject = Instantiate(entry.prefab);
-                    componentControl.CreateGridForObject(selectableObject.transform);
+                if (entry.partType == ProjectManager.Instance.partType) {
+                    taskControl.Initialize(entry.part.tasks);
                     return;
                 }
             }

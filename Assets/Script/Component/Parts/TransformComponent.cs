@@ -1,7 +1,6 @@
 using System;
 using Script.Enum;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 
 namespace Script.Component.Parts {
@@ -102,11 +101,19 @@ namespace Script.Component.Parts {
         }
 
         private void SetRotation(Transform rotation) {
-            var angle = TransformUtils.GetInspectorRotation(rotation);
+            var angle = rotation.eulerAngles;
 
-            rotationX.text = angle.x.ToString(FORMAT);
-            rotationY.text = angle.y.ToString(FORMAT);
-            rotationZ.text = angle.z.ToString(FORMAT);
+            rotationX.text = InspectorRotation(angle.x).ToString(FORMAT);
+            rotationY.text = InspectorRotation(angle.y).ToString(FORMAT);
+            rotationZ.text = InspectorRotation(angle.z).ToString(FORMAT);
+        }
+
+        private float InspectorRotation(float angle) {
+            if (angle > 180) {
+                angle -= 360;
+            }
+
+            return angle;
         }
 
     }

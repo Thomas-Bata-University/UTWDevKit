@@ -325,6 +325,7 @@ MonoBehaviour:
   Notes: 'Create new project.
 
     Open existing project.'
+  partType: 0
 --- !u!4 &166253902
 Transform:
   m_ObjectHideFlags: 0

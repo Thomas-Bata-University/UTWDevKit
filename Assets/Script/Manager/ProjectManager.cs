@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Script.Enum;
 using Script.Static;
@@ -19,6 +20,12 @@ namespace Script.Manager {
 
         private const string ControlFile = "controlFile"; //File for UTW project confirmation
 
+        private const string HullFolder = "hull";
+        private const string TurretFolder = "turret";
+        private const string SuspensionFolder = "suspension";
+        private const string WeaponryFolder = "weaponry";
+        private const string ResourceFolder = "resource";
+
         public TankPartType partType = TankPartType.Hull;
 
         private void Awake() {
@@ -31,7 +38,7 @@ namespace Script.Manager {
             }
         }
 
-        #region Create
+        #region Create project
 
         public void CreateProject() {
             FileBrowser.ShowSaveDialog((paths) => { OnProjectCreate(paths[0]); },
@@ -44,22 +51,37 @@ namespace Script.Manager {
                 Directory.CreateDirectory(path);
                 Debug.Log($"Created {path}");
 
-                string controlFilePath = Path.Combine(path, ControlFile);
-                using (var controlFile = File.CreateText(controlFilePath)) {
-                    controlFile.Write(GUID.Generate());
-                }
+                CreateFolders(path);
 
-                File.SetAttributes(controlFilePath, FileAttributes.Hidden);
-                SceneManager.LoadScene(SceneNames.Editor);
+                SceneManager.LoadScene(SceneNames.Preview);
             }
             else {
                 Debug.LogError("Project with this name already exists");
             }
         }
 
+        private void CreateFolders(string path) {
+            string controlFilePath = Path.Combine(path, ControlFile);
+            using (var controlFile = File.CreateText(controlFilePath)) {
+                controlFile.Write(Guid.NewGuid());
+            }
+
+            File.SetAttributes(controlFilePath, FileAttributes.Hidden);
+
+            CreateDirectory(path, HullFolder);
+            CreateDirectory(path, TurretFolder);
+            CreateDirectory(path, SuspensionFolder);
+            CreateDirectory(path, WeaponryFolder);
+            CreateDirectory(path, ResourceFolder);
+        }
+
+        private void CreateDirectory(string path, string folderName) {
+            Directory.CreateDirectory(Path.Combine(path, folderName));
+        }
+
         #endregion
 
-        #region Open
+        #region Open project
 
         public void OpenProject() {
             FileBrowser.ShowLoadDialog((paths) => { OnProjectOpen(paths[0]); },
@@ -70,8 +92,7 @@ namespace Script.Manager {
         private void OnProjectOpen(string path) {
             if (File.Exists(Path.Combine(path, ControlFile))) {
                 Debug.Log("Selected: " + path);
-                partType = TankPartType.Hull; //TODO implement logic
-                SceneManager.LoadScene(SceneNames.Editor);
+                SceneManager.LoadScene(SceneNames.Preview);
             }
             else {
                 Debug.LogError("Cannot open. This is not a UTW project.");

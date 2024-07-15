@@ -9,9 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b532c43a64d12874e8e2e3d1d1206a34, type: 3}
+  m_Script: {fileID: 11500000, guid: 9bac9cca7bcff1145bd6afe764299665, type: 3}
   m_Name: Turret
   m_EditorClassIdentifier: 
+  type: 0
   prefabEntry:
   - componentType: 0
     prefab: {fileID: 2608078969406280013, guid: b0be25457a1d17c45a899f9f3f3c5ce4, type: 3}
+  tasks:
+  - {fileID: 1996244005816050738, guid: 8a418bf7db89ddc4f90e81e341392107, type: 3}

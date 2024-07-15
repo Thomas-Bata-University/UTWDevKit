@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Script.Buttons;
 using Script.Enum;
 using Script.Static;
+using Script.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -17,11 +19,13 @@ namespace Script.Controller {
         //--------------------------------------------------------------------------------------------------------------------------
 
         public static UnityAction<Transform> OnObjectSelected;
+        public static UnityAction<Transform> OnObjectRemove;
 
         public ComponentControl componentControl;
         public ControlPanel controlPanel;
         public Canvas canvas;
         public Camera mainCamera;
+        public GameObject deleteButton;
         private Transform _selectedObject;
         private float _distance;
         private Vector3 _offset;
@@ -35,9 +39,24 @@ namespace Script.Controller {
         private bool _isHoldingMouse;
         private bool _isMovingMouse;
 
+        public LayerMask targetLayer;
+        private Transform _selectedAxis;
+        private Vector3 _originalScale;
+
+        private void Start() {
+            deleteButton.SetActive(false);
+        }
+
         private void Update() {
+
             if (Input.GetKeyDown(KeyCode.Escape)) {
                 DeselectObject();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Delete)) {
+                if (_selectedObject is not null) {
+                    RemoveObject();
+                }
             }
 
             if (Input.GetMouseButtonDown(0)) {
@@ -70,6 +89,9 @@ namespace Script.Controller {
                     }
                 }
             }
+            else {
+                SelectAxis();
+            }
 
             if (Input.GetMouseButtonUp(0)) {
                 if (!_isMovingMouse && !_isHoldingMouse) {
@@ -90,12 +112,18 @@ namespace Script.Controller {
                 if (_selectedObject == hit.transform) return;
 
                 if (_selectedObject != hit.transform || _selectedObject is null) {
+                    //Old
                     Outline(_selectedObject, false);
                     componentControl.DisableComponents(_selectedObject);
+                    ObjectUtils.SetCanvasVisible(_selectedObject);
 
                     SetSelectedObject(hit.transform);
+                    deleteButton.SetActive(true);
+
+                    //New
                     Outline(_selectedObject, true);
                     componentControl.EnableComponents(_selectedObject);
+                    ObjectUtils.SetCanvasVisible(_selectedObject);
                 }
             }
             else {
@@ -106,20 +134,55 @@ namespace Script.Controller {
 
         private void DeselectObject() {
             if (_selectedObject is null) return;
+            ObjectUtils.SetCanvasVisible(_selectedObject);
             componentControl.DisableComponents(_selectedObject);
             Outline(_selectedObject, false);
             SetSelectedObject(null);
+            deleteButton.SetActive(false);
+        }
+
+        private void SelectAxis() {
+            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, targetLayer)) {
+                GameObject hitObject = hit.collider.gameObject;
+
+                if (hitObject.CompareTag(Tags.Axis)) {
+                    if (_selectedAxis != hitObject) {
+                        if (_selectedAxis != null) {
+                            _selectedAxis.transform.localScale = _originalScale;
+                        }
+
+                        _originalScale = hitObject.transform.localScale;
+
+                        hitObject.transform.localScale =
+                            new Vector3(_originalScale.x * 1.5f, _originalScale.y, _originalScale.z * 1.5f);
+
+                        _selectedAxis = hitObject.transform;
+                    }
+                }
+            }
+            else {
+                if (_selectedAxis != null) {
+                    _selectedAxis.transform.localScale = _originalScale;
+                    _selectedAxis = null;
+                }
+            }
         }
 
         private void MoveObject() {
             if (!_isHoldingObject) return;
+
+            Axis axis = _selectedAxis is null ? Axis.Free : _selectedAxis.GetComponent<ButtonAxis>().axis;
+            Debug.Log(axis);
 
             var mousePosition = Input.mousePosition;
             mousePosition.z = _distance;
             var worldPos = mainCamera.ScreenToWorldPoint(mousePosition);
             var newPosition = _selectedObject.position;
 
-            switch (controlPanel.GetControl().Axis) {
+            switch (axis) {
                 case Axis.X: {
                     newPosition.x = worldPos.x + _offset.x;
                 }
@@ -135,19 +198,19 @@ namespace Script.Controller {
                 case Axis.Free: {
                     var screenPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, _distance);
                     var pos = mainCamera.ScreenToWorldPoint(screenPosition);
-                    _selectedObject.position = pos + _offset;
+                    SetPosition(pos + _offset);
                     return;
                 }
             }
 
-            _selectedObject.position = newPosition;
+            SetPosition(newPosition);
         }
 
         private void RotateObject() {
             if (!_isHoldingObject) return;
             float mouse = 0f;
             Vector3 rotate = Vector3.zero;
-            switch (controlPanel.GetControl().Axis) {
+            switch (Axis.X) { //TODO fix rotation
                 case Axis.X: {
                     mouse = Input.GetAxis("Mouse Y");
                     rotate = Vector3.left;
@@ -166,12 +229,12 @@ namespace Script.Controller {
                 case Axis.Free: {
                     float mouseX = Input.GetAxis("Mouse X") * 2;
                     float mouseY = Input.GetAxis("Mouse Y") * 2;
-                    _selectedObject.Rotate(mouseY, -mouseX, 0, Space.World);
+                    SetRotation(mouseY, -mouseX, 0);
                 }
                     break;
             }
 
-            _selectedObject.Rotate(rotate, -mouse * 2f, Space.World);
+            SetRotation(rotate, -mouse * 2f);
         }
 
         /// <summary>
@@ -188,13 +251,26 @@ namespace Script.Controller {
                           _distance));
         }
 
+        private void SetPosition(Vector3 pos) {
+            _selectedObject.position = pos;
+            ObjectUtils.GetCanvas(_selectedObject).position = pos;
+        }
+
+        private void SetRotation(Vector3 axis, float angle) {
+            _selectedObject.Rotate(axis, angle, Space.World);
+        }
+
+        private void SetRotation(float xAngle, float yAngle, float zAngle) {
+            _selectedObject.Rotate(xAngle, yAngle, zAngle, Space.World);
+        }
+
         /// <summary>
         /// Checks if the selected object has been hit.
         /// </summary>
         private void SetHoldingObject() {
             var ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out var hit)) {
-                if (hit.transform == _selectedObject) {
+                if (hit.transform == _selectedObject || _selectedAxis is not null) {
                     _isHoldingObject = true;
                 }
                 else {
@@ -245,6 +321,13 @@ namespace Script.Controller {
             }
 
             return false;
+        }
+
+        public void RemoveObject() {
+            OnObjectRemove?.Invoke(_selectedObject);
+            Destroy(_selectedObject.gameObject);
+            _selectedObject = null;
+            deleteButton.SetActive(false);
         }
 
     }

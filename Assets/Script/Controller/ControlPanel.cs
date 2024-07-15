@@ -1,7 +1,9 @@
 using Script.Buttons;
-using Script.Enum;
+using Script.Static;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Action = Script.Enum.Action;
 
 namespace Script.Controller {
     public class ControlPanel : MonoBehaviour {
@@ -13,43 +15,43 @@ namespace Script.Controller {
         //--------------------------------------------------------------------------------------------------------------------------
 
         public Button[] actionButtons;
-        public Button[] axisButtons;
 
         public Button activeActionButton;
-        public Button activeAxisButton;
 
         public struct ActionControl {
 
-            public ActionControl(Action action, Axis axis) {
+            public ActionControl(Action action) {
                 Action = action;
-                Axis = axis;
             }
 
             public Action Action;
-            public Axis Axis;
 
         }
 
         private void Start() {
-            OnButtonClick(activeActionButton);
-            OnButtonClicka(activeAxisButton);
+            OnButtonClickAction(activeActionButton);
 
             foreach (Button button in actionButtons) {
-                button.onClick.AddListener(() => OnButtonClick(button));
+                button.onClick.AddListener(() => OnButtonClickAction(button));
+            }
+        }
+
+        private void Update() {
+            if (Input.GetKeyDown(KeyCode.Alpha1)) {
+                OnButtonClickAction(actionButtons[0]);
             }
 
-            foreach (Button button in axisButtons) {
-                button.onClick.AddListener(() => OnButtonClicka(button));
+            if (Input.GetKeyDown(KeyCode.Alpha2)) {
+                OnButtonClickAction(actionButtons[1]);
             }
         }
 
         public ActionControl GetControl() {
             var action = activeActionButton.gameObject.GetComponent<ButtonAction>().action;
-            var axis = activeAxisButton.gameObject.GetComponent<ButtonAxis>().axis;
-            return new ActionControl(action, axis);
+            return new ActionControl(action);
         }
 
-        private void OnButtonClick(Button clickedButton) {
+        private void OnButtonClickAction(Button clickedButton) {
             if (activeActionButton != null) {
                 activeActionButton.interactable = true;
             }
@@ -58,13 +60,8 @@ namespace Script.Controller {
             activeActionButton.interactable = false;
         }
 
-        private void OnButtonClicka(Button clickedButton) {
-            if (activeAxisButton != null) {
-                activeAxisButton.interactable = true;
-            }
-
-            activeAxisButton = clickedButton;
-            activeAxisButton.interactable = false;
+        public void Back() {
+            SceneManager.LoadScene(SceneNames.Preview);
         }
 
     }

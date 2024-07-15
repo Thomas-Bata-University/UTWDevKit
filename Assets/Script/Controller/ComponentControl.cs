@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using Script.Component;
 using Script.Enum;
-using Script.TankPart;
+using Script.Task;
+using Script.Utils;
 using UnityEngine;
 
 namespace Script.Controller {
@@ -22,10 +23,13 @@ namespace Script.Controller {
         [Header("Actual components")]
         public Transform componentPanel;
         public GameObject componentGridPrefab;
-        private Transform _selectedObject;
 
         private void Start() {
-            ObjectControl.OnObjectSelected += selectedObject => _selectedObject = selectedObject;
+            ObjectControl.OnObjectRemove += selectedObject => {
+                DisableComponents(selectedObject);
+                _componentList.Remove(selectedObject);
+            };
+            ATask.OnPartCreation += (obj, data) => CreateGridForObject(obj, data.Initialize());
         }
 
         public void EnableComponents(Transform selectedObject) {
@@ -48,21 +52,20 @@ namespace Script.Controller {
         }
 
         /// <summary>
-        /// Create grid created object.
+        /// Create grid for created object.
         /// </summary>
-        public void CreateGridForObject(Transform selectedObject) {
-            _selectedObject = selectedObject;
+        public void CreateGridForObject(Transform parentObject, Dictionary<ComponentType, GameObject> data) {
             var componentGrid = Instantiate(componentGridPrefab, componentPanel);
-            componentGrid.name = selectedObject.name + "_componentGrid";
+            componentGrid.name = parentObject.name + "_componentGrid";
 
             List<AComponent> componentList = new();
-            var data = selectedObject.GetComponent<TankPartData>().data.Initialize();
+            var obj = ObjectUtils.GetReference(parentObject.transform);
             foreach (var pair in data) {
-                componentList.Add(CreateComponent(componentGrid, selectedObject.transform, pair));
+                componentList.Add(CreateComponent(componentGrid, obj, pair));
             }
 
-            _componentList.Add(selectedObject.transform,
-                new ComponentData(selectedObject.gameObject, componentGrid, componentList));
+            _componentList.Add(obj,
+                new ComponentData(parentObject.gameObject, componentGrid, componentList));
             componentGrid.SetActive(false);
         }
 

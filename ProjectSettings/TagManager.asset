@@ -7,6 +7,14 @@ TagManager:
   - Selectable
   - ComponentPanel
   - ControlPanel
+  - TaskPanel
+  - Hull
+  - Plate
+  - Suspension
+  - Turret
+  - Weaponry
+  - CanvasCamera
+  - Axis
   layers:
   - Default
   - TransparentFX
