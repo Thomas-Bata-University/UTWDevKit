@@ -143,7 +143,7 @@ MonoBehaviour:
   description: Create plate
   text: {fileID: 3810561804706900229}
   isCompleteImage: {fileID: 5717438993468219210}
-  partData: {fileID: 11400000, guid: 8b1d03e913868594eb8058d3da48fae4, type: 2}
+  components: {fileID: 11400000, guid: 0ca69fa00003db34985123ce6b2e7693, type: 2}
   prefab: {fileID: 5657382595514839669, guid: 9c804d1f54c5a7c429ce9232cdc6abab, type: 3}
   countText: {fileID: 1748776605565188361}
 --- !u!114 &3810561804706900229 stripped

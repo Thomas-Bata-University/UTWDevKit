@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Script.Enum;
-using Script.Task;
 using UnityEngine;
 
-namespace Script.Part {
-    [CreateAssetMenu(fileName = "Part", menuName = "Part")]
-    public class TankPart : ScriptableObject {
-
-        public TankPartType type;
+namespace Script.SO {
+    [CreateAssetMenu(fileName = "Component", menuName = "Data/Component")]
+    public class ComponentSO : ScriptableObject {
 
         #region Component
 
@@ -26,10 +23,10 @@ namespace Script.Part {
         }
 
         [Header("Component")]
-        public PrefabEntry[] prefabEntry;
+        public PrefabEntry[] componentData;
 
         public Dictionary<ComponentType, GameObject> Initialize() {
-            foreach (var entry in prefabEntry) {
+            foreach (var entry in componentData) {
                 if (!_prefabDictionary.ContainsKey(entry.componentType))
                     _prefabDictionary.Add(entry.componentType, entry.prefab);
             }
@@ -44,13 +41,6 @@ namespace Script.Part {
 
             return null;
         }
-
-        #endregion
-
-        #region Tasks
-
-        [Header("Task")]
-        public List<GameObject> tasks;
 
         #endregion
 

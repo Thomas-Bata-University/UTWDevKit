@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 303978033924658179, guid: 86a84c956a146044282a07f091a47d4a, type: 3}
       propertyPath: m_LocalScale.y
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 303978033924658179, guid: 86a84c956a146044282a07f091a47d4a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -54,7 +54,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1495295778619176859, guid: 86a84c956a146044282a07f091a47d4a, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.2
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2281777031719663124, guid: 86a84c956a146044282a07f091a47d4a, type: 3}
+      propertyPath: m_TagString
+      value: Plate
       objectReference: {fileID: 0}
     - target: {fileID: 2552162988460634414, guid: 86a84c956a146044282a07f091a47d4a, type: 3}
       propertyPath: m_Materials.Array.data[0]

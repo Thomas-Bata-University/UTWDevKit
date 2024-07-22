@@ -1,6 +1,7 @@
 using Script.Buttons;
 using Script.Static;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Action = Script.Enum.Action;
@@ -14,19 +15,11 @@ namespace Script.Controller {
 
         //--------------------------------------------------------------------------------------------------------------------------
 
+        public UnityAction<Action> OnActionChange;
+
         public Button[] actionButtons;
 
         public Button activeActionButton;
-
-        public struct ActionControl {
-
-            public ActionControl(Action action) {
-                Action = action;
-            }
-
-            public Action Action;
-
-        }
 
         private void Start() {
             OnButtonClickAction(activeActionButton);
@@ -36,19 +29,8 @@ namespace Script.Controller {
             }
         }
 
-        private void Update() {
-            if (Input.GetKeyDown(KeyCode.Alpha1)) {
-                OnButtonClickAction(actionButtons[0]);
-            }
-
-            if (Input.GetKeyDown(KeyCode.Alpha2)) {
-                OnButtonClickAction(actionButtons[1]);
-            }
-        }
-
-        public ActionControl GetControl() {
-            var action = activeActionButton.gameObject.GetComponent<ButtonAction>().action;
-            return new ActionControl(action);
+        public Action GetAction() {
+            return activeActionButton.gameObject.GetComponent<ButtonAction>().action;
         }
 
         private void OnButtonClickAction(Button clickedButton) {
@@ -58,6 +40,8 @@ namespace Script.Controller {
 
             activeActionButton = clickedButton;
             activeActionButton.interactable = false;
+
+            OnActionChange?.Invoke(GetAction());
         }
 
         public void Back() {

@@ -147,7 +147,7 @@ MonoBehaviour:
   description: Create hull
   text: {fileID: 3810561804706900229}
   isCompleteImage: {fileID: 5717438993468219210}
-  partData: {fileID: 11400000, guid: ec6eaa3a64577a844872eb8ff1c19edd, type: 2}
+  components: {fileID: 11400000, guid: b058ca79c00e19244b1d15975d3e6f2d, type: 2}
   prefab: {fileID: 5180890721319080978, guid: b82601d3342ddaf4f9d9ec989f370afa, type: 3}
   countText: {fileID: 1748776605565188361}
 --- !u!114 &3810561804706900229 stripped

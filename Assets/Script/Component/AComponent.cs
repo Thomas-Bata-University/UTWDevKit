@@ -1,5 +1,3 @@
-using Script.Controller;
-using Script.Enum;
 using UnityEngine;
 
 namespace Script.Component {
@@ -10,8 +8,6 @@ namespace Script.Component {
 
         public string componentName;
         [HideInInspector] public Transform objectInstance; //Selected object of the component
-        [HideInInspector] public ComponentType type;
-        [HideInInspector] public ComponentControl componentControl;
 
         protected bool IsObjectMoving;
 
@@ -51,10 +47,8 @@ namespace Script.Component {
 
         protected abstract void UpdateImpl();
 
-        public void Initialize(Transform objectInstance, ComponentType type, ComponentControl componentControl) {
+        public void Initialize(Transform objectInstance) {
             this.objectInstance = objectInstance;
-            this.type = type;
-            this.componentControl = componentControl;
         }
 
     }

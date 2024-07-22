@@ -154,7 +154,7 @@ MonoBehaviour:
   description: Create suspension
   text: {fileID: 8179750578385864519}
   isCompleteImage: {fileID: 738016863537492232}
-  partData: {fileID: 11400000, guid: 756f0ca8be108f446b969af60ec273f0, type: 2}
+  components: {fileID: 11400000, guid: df2b049942460524bbb2f7cb53aca322, type: 2}
   prefab: {fileID: 9184945094009286517, guid: 7bc29b06a7e3bd444862d85a52c5d973, type: 3}
   countText: {fileID: 6710782475045197643}
 --- !u!114 &8179750578385864519 stripped

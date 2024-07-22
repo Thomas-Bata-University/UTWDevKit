@@ -1,5 +1,6 @@
 using System;
 using Script.Enum;
+using Script.Utils;
 using TMPro;
 using UnityEngine;
 
@@ -53,8 +54,10 @@ namespace Script.Component.Parts {
         }
 
         public void ResetPosition() {
-            objectInstance.position = Vector3.zero;
-            SetPosition(objectInstance.position);
+            var position = Vector3.zero;
+            objectInstance.position = position;
+            ObjectUtils.GetCanvas(objectInstance).transform.position = position;
+            SetPosition(position);
         }
 
         public void ResetRotation() {
@@ -66,6 +69,7 @@ namespace Script.Component.Parts {
             var position = CalculateTransform(value, axis, objectInstance.position);
 
             objectInstance.position = position;
+            ObjectUtils.GetCanvas(objectInstance).transform.position = position;
             SetPosition(position);
         }
 

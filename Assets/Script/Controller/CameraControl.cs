@@ -1,7 +1,7 @@
 using UnityEngine;
 
 namespace Script.Controller {
-    public class CamerControl : MonoBehaviour {
+    public class CameraControl : MonoBehaviour {
 
         //Add comment to a script
         [TextArea(1, 5)]
@@ -19,7 +19,7 @@ namespace Script.Controller {
         public float acceleration = 0.5f;
         public float currentSpeed = 0f;
         public float maxSpeed = 5f;
-        public float dragSpeed = 40f;
+        public float dragSpeed = 20f;
         public float zoomSpeed = 3f;
 
         private void Start() {

@@ -48,6 +48,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2281777031719663124, guid: 86a84c956a146044282a07f091a47d4a, type: 3}
+      propertyPath: m_TagString
+      value: Suspension
+      objectReference: {fileID: 0}
     - target: {fileID: 8678605368194562995, guid: 86a84c956a146044282a07f091a47d4a, type: 3}
       propertyPath: m_Mesh
       value: 

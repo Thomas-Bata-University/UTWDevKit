@@ -41,14 +41,20 @@ namespace Script.Controller {
 
         public LayerMask targetLayer;
         private Transform _selectedAxis;
-        private Vector3 _originalScale;
+        public Material selectedMaterial;
+        private Material _originalMaterial;
 
         private void Start() {
             deleteButton.SetActive(false);
+
+            controlPanel.OnActionChange += action => EnableActionGraphic(_selectedObject, action);
+        }
+
+        private void OnDestroy() {
+            controlPanel.OnActionChange -= action => EnableActionGraphic(_selectedObject, action);
         }
 
         private void Update() {
-
             if (Input.GetKeyDown(KeyCode.Escape)) {
                 DeselectObject();
             }
@@ -71,7 +77,7 @@ namespace Script.Controller {
             if (Input.GetMouseButton(0)) {
                 if (IsMovingMouse()) {
                     _isMovingMouse = true;
-                    switch (controlPanel.GetControl().Action) {
+                    switch (controlPanel.GetAction()) {
                         case Action.Position: {
                             MoveObject();
                         }
@@ -101,6 +107,9 @@ namespace Script.Controller {
                 _isHoldingMouse = false;
                 _isMovingMouse = false;
                 _isHoldingObject = false;
+
+                if (_selectedObject is not null)
+                    ObjectUtils.GetTorus(_selectedObject).transform.rotation = new Quaternion(0, 0, 0, 0);
             }
         }
 
@@ -124,6 +133,7 @@ namespace Script.Controller {
                     Outline(_selectedObject, true);
                     componentControl.EnableComponents(_selectedObject);
                     ObjectUtils.SetCanvasVisible(_selectedObject);
+                    EnableActionGraphic(_selectedObject, controlPanel.GetAction());
                 }
             }
             else {
@@ -141,6 +151,19 @@ namespace Script.Controller {
             deleteButton.SetActive(false);
         }
 
+        private void EnableActionGraphic(Transform selectedObject, Action action) {
+            if (selectedObject is null) return;
+
+            switch (action) {
+                case Action.Position:
+                    ObjectUtils.EnableArrows(selectedObject);
+                    break;
+                case Action.Rotation:
+                    ObjectUtils.EnableTorus(selectedObject);
+                    break;
+            }
+        }
+
         private void SelectAxis() {
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
@@ -151,13 +174,12 @@ namespace Script.Controller {
                 if (hitObject.CompareTag(Tags.Axis)) {
                     if (_selectedAxis != hitObject) {
                         if (_selectedAxis != null) {
-                            _selectedAxis.transform.localScale = _originalScale;
+                            _selectedAxis.GetComponent<MeshRenderer>().material = _originalMaterial;
                         }
 
-                        _originalScale = hitObject.transform.localScale;
+                        _originalMaterial = hitObject.GetComponent<MeshRenderer>().material;
 
-                        hitObject.transform.localScale =
-                            new Vector3(_originalScale.x * 1.5f, _originalScale.y, _originalScale.z * 1.5f);
+                        hitObject.GetComponent<MeshRenderer>().material = selectedMaterial;
 
                         _selectedAxis = hitObject.transform;
                     }
@@ -165,7 +187,7 @@ namespace Script.Controller {
             }
             else {
                 if (_selectedAxis != null) {
-                    _selectedAxis.transform.localScale = _originalScale;
+                    _selectedAxis.GetComponent<MeshRenderer>().material = _originalMaterial;
                     _selectedAxis = null;
                 }
             }
@@ -175,7 +197,6 @@ namespace Script.Controller {
             if (!_isHoldingObject) return;
 
             Axis axis = _selectedAxis is null ? Axis.Free : _selectedAxis.GetComponent<ButtonAxis>().axis;
-            Debug.Log(axis);
 
             var mousePosition = Input.mousePosition;
             mousePosition.z = _distance;
@@ -207,10 +228,10 @@ namespace Script.Controller {
         }
 
         private void RotateObject() {
-            if (!_isHoldingObject) return;
+            if (!_isHoldingObject || _selectedAxis is null) return;
             float mouse = 0f;
             Vector3 rotate = Vector3.zero;
-            switch (Axis.X) { //TODO fix rotation
+            switch (_selectedAxis.GetComponent<ButtonAxis>().axis) { //TODO fix rotation
                 case Axis.X: {
                     mouse = Input.GetAxis("Mouse Y");
                     rotate = Vector3.left;
@@ -258,6 +279,7 @@ namespace Script.Controller {
 
         private void SetRotation(Vector3 axis, float angle) {
             _selectedObject.Rotate(axis, angle, Space.World);
+            ObjectUtils.GetTorus(_selectedObject).transform.Rotate(axis, angle, Space.World);
         }
 
         private void SetRotation(float xAngle, float yAngle, float zAngle) {
@@ -325,7 +347,7 @@ namespace Script.Controller {
 
         public void RemoveObject() {
             OnObjectRemove?.Invoke(_selectedObject);
-            Destroy(_selectedObject.gameObject);
+            Destroy(_selectedObject.parent.gameObject);
             _selectedObject = null;
             deleteButton.SetActive(false);
         }

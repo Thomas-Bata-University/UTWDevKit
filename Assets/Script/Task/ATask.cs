@@ -1,11 +1,14 @@
 using System;
+using System.Collections.Generic;
 using Script.Controller;
-using Script.Part;
+using Script.Enum;
+using Script.SO;
 using Script.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using Action = System.Action;
 using Logger = Script.Log.Logger;
 
 namespace Script.Task {
@@ -14,7 +17,7 @@ namespace Script.Task {
     /// </summary>
     public abstract class ATask : MonoBehaviour {
 
-        public static UnityAction<Transform, TankPart> OnPartCreation;
+        public static UnityAction<Transform, Dictionary<ComponentType, GameObject>> OnPartCreation;
 
         public string description;
         private bool _isComplete;
@@ -22,7 +25,7 @@ namespace Script.Task {
         public TextMeshProUGUI text;
         public Image isCompleteImage;
 
-        public TankPart partData;
+        public ComponentSO components;
         public GameObject prefab;
         protected string Tag;
 
@@ -71,7 +74,7 @@ namespace Script.Task {
 
         public virtual void Create() {
             var go = Instantiate(prefab, Vector3.zero, Quaternion.identity);
-            OnPartCreation?.Invoke(go.transform, partData);
+            OnPartCreation?.Invoke(go.transform, components.Initialize());
             SetText(++ActualCount);
         }
 
@@ -96,6 +99,10 @@ namespace Script.Task {
             }
 
             Logger.Instance.LogMessage($"Cannot create {Tag} - maximum is {MaxCount}");
+        }
+
+        private void OnDestroy() {
+            ObjectControl.OnObjectRemove -= RemoveObject;
         }
 
     }

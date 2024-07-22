@@ -25,11 +25,18 @@ namespace Script.Controller {
         public GameObject componentGridPrefab;
 
         private void Start() {
-            ObjectControl.OnObjectRemove += selectedObject => {
-                DisableComponents(selectedObject);
-                _componentList.Remove(selectedObject);
-            };
-            ATask.OnPartCreation += (obj, data) => CreateGridForObject(obj, data.Initialize());
+            ObjectControl.OnObjectRemove += OnObjectRemove;
+            ATask.OnPartCreation += CreateGridForObject;
+        }
+
+        private void OnDestroy() {
+            ObjectControl.OnObjectRemove -= OnObjectRemove;
+            ATask.OnPartCreation -= CreateGridForObject;
+        }
+
+        private void OnObjectRemove(Transform selectedObject) {
+            DisableComponents(selectedObject);
+            _componentList.Remove(selectedObject);
         }
 
         public void EnableComponents(Transform selectedObject) {
@@ -46,7 +53,7 @@ namespace Script.Controller {
             KeyValuePair<ComponentType, GameObject> pair) {
             var component = Instantiate(pair.Value, componentGrid.transform.GetChild(0).GetChild(0));
             var componentScript = component.GetComponent<AComponent>();
-            componentScript.Initialize(selectedObject, pair.Key, this);
+            componentScript.Initialize(selectedObject);
             component.name = componentScript.componentName;
             return null;
         }
@@ -54,18 +61,18 @@ namespace Script.Controller {
         /// <summary>
         /// Create grid for created object.
         /// </summary>
-        public void CreateGridForObject(Transform parentObject, Dictionary<ComponentType, GameObject> data) {
+        public void CreateGridForObject(Transform parentObject, Dictionary<ComponentType, GameObject> components) {
             var componentGrid = Instantiate(componentGridPrefab, componentPanel);
             componentGrid.name = parentObject.name + "_componentGrid";
 
             List<AComponent> componentList = new();
             var obj = ObjectUtils.GetReference(parentObject.transform);
-            foreach (var pair in data) {
+            foreach (var pair in components) {
                 componentList.Add(CreateComponent(componentGrid, obj, pair));
             }
 
             _componentList.Add(obj,
-                new ComponentData(parentObject.gameObject, componentGrid, componentList));
+                new ComponentData(obj.gameObject, componentGrid, componentList));
             componentGrid.SetActive(false);
         }
 

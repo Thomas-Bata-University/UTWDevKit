@@ -143,7 +143,7 @@ MonoBehaviour:
   description: Create weaponry
   text: {fileID: 168562889552488997}
   isCompleteImage: {fileID: 8786349920447421546}
-  partData: {fileID: 11400000, guid: 9da08723b6016594d81d609432e82e45, type: 2}
+  components: {fileID: 11400000, guid: 985498b6db52d92478438898e80929d4, type: 2}
   prefab: {fileID: 5004941218618208362, guid: f9c0549bbace96b43b7c475b1604bff7, type: 3}
   countText: {fileID: 3383304777673144873}
 --- !u!114 &3383304777673144873 stripped

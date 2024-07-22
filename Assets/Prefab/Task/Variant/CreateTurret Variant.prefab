@@ -143,7 +143,7 @@ MonoBehaviour:
   description: Create turret
   text: {fileID: 636302295826510827}
   isCompleteImage: {fileID: 8317339461551326628}
-  partData: {fileID: 11400000, guid: cd07cbd270922d64786d36c992e91b1b, type: 2}
+  components: {fileID: 11400000, guid: 196defeeba6eebd4b81995834f98e5ad, type: 2}
   prefab: {fileID: 2927711133474959291, guid: 40094707506ec4c428d6e77e6e92fcc8, type: 3}
   countText: {fileID: 2626068461213787111}
 --- !u!114 &2626068461213787111 stripped
