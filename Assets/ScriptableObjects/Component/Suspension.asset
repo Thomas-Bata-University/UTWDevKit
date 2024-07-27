@@ -15,3 +15,5 @@ MonoBehaviour:
   componentData:
   - componentType: 0
     prefab: {fileID: 1628706485522603181, guid: 10a08ad7a907cdf4d87ed0f5ce9b30fd, type: 3}
+  - componentType: 1
+    prefab: {fileID: 5805719354390279785, guid: 6a866d43774a594468203674a3adcce4, type: 3}

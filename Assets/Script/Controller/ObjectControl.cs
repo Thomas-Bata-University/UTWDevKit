@@ -124,7 +124,10 @@ namespace Script.Controller {
                 if (_selectedObject != hit.transform || _selectedObject is null) {
                     //Old
                     Outline(_selectedObject, false);
-                    OnObjectDeselected?.Invoke(_selectedObject);
+
+                    if (_selectedObject is not null)
+                        OnObjectDeselected?.Invoke(_selectedObject);
+
                     componentControl.DisableComponents(_selectedObject);
                     ObjectUtils.SetCanvasVisible(_selectedObject);
 
@@ -258,7 +261,7 @@ namespace Script.Controller {
                     break;
             }
 
-            SetRotation(rotate, -mouse * 2f);
+            SetRotation(ObjectUtils.GetObjectCenter(_selectedObject), rotate, -mouse * 2f);
         }
 
         /// <summary>
@@ -280,8 +283,8 @@ namespace Script.Controller {
             ObjectUtils.GetCanvas(_selectedObject).position = ObjectUtils.GetObjectCenter(_selectedObject);
         }
 
-        private void SetRotation(Vector3 axis, float angle) {
-            _selectedObject.Rotate(axis, angle, Space.World);
+        private void SetRotation(Vector3 point, Vector3 axis, float angle) {
+            _selectedObject.RotateAround(point, axis, angle);
             ObjectUtils.GetTorus(_selectedObject).transform.Rotate(axis, angle, Space.World);
         }
 

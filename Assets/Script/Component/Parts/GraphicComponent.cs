@@ -1,19 +1,25 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
+using GLTFast;
 using Script.Controller;
 using Script.Manager;
 using Script.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityGLTF;
+using Logger = Script.Log.Logger;
 using Object = UnityEngine.Object;
 
 namespace Script.Component.Parts {
-    public class MeshComponent : AComponent {
+    public class GraphicComponent : AComponent {
+
+        //Add comment to a script
+        [TextArea(1, 5)]
+        public string Notes = "Comment";
+
+        //--------------------------------------------------------------------------------------------------------------------------
 
         public static Action OnMeshChange;
 
@@ -78,8 +84,26 @@ namespace Script.Component.Parts {
         }
 
         private async Task<Mesh> ImportMesh(string path) {
-            var loader = new GLTFSceneImporter(path, new ImportOptions());
-            return await loader.LoadMeshAsync(0, CancellationToken.None);
+            var gltf = new GltfImport();
+            var settings = new ImportSettings {
+                GenerateMipMaps = true,
+                AnisotropicFilterLevel = 3,
+                NodeNameMethod = NameImportMethod.OriginalUnique
+            };
+
+            var success = await gltf.Load(path, settings);
+
+            if (success) {
+                if (gltf.GetMeshes().Length <= 0) {
+                    Logger.Instance.LogMessage($"Missing material in {Path.GetFileName(path)}. Cannot import.");
+                    return null;
+                }
+
+                return gltf.GetMeshes()[0]; //TODO what to do when multiple meshes
+            }
+
+            Logger.Instance.LogMessage("Cannot select this mesh.");
+            throw new Exception();
         }
 
         #endregion
@@ -114,8 +138,26 @@ namespace Script.Component.Parts {
         }
 
         private async Task<Material> ImportMaterial(string path) {
-            var loader = new GLTFSceneImporter(path, new ImportOptions());
-            return await loader.LoadMaterialAsync(0);
+            var gltf = new GltfImport();
+            var settings = new ImportSettings {
+                GenerateMipMaps = true,
+                AnisotropicFilterLevel = 3,
+                NodeNameMethod = NameImportMethod.OriginalUnique
+            };
+
+            var success = await gltf.Load(path, settings);
+
+            if (success) {
+                if (gltf.GetMaterial() is null) {
+                    Logger.Instance.LogMessage($"Missing material in {Path.GetFileName(path)}. Cannot import.");
+                    return null;
+                }
+
+                return gltf.GetMaterial();
+            }
+
+            Logger.Instance.LogMessage("Cannot select this material.");
+            throw new Exception();
         }
 
         #endregion
@@ -131,11 +173,14 @@ namespace Script.Component.Parts {
             string[] files = Directory.GetFiles(resourceFolder, "*.gltf");
 
             foreach (string filePath in files) {
+                var import = await callback(filePath);
+                if (import is null) continue;
+
                 var fileName = Path.GetFileName(filePath);
                 var record = Instantiate(recordPrefab, content.transform);
                 record.GetComponentInChildren<TextMeshProUGUI>().text = fileName;
                 record.GetComponent<Button>().onClick.AddListener(() => _selectedRecord = record);
-                _contentData.Add(record, await callback(filePath));
+                _contentData.Add(record, import);
             }
         }
 

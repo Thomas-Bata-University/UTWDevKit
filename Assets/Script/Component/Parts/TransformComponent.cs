@@ -26,7 +26,7 @@ namespace Script.Component.Parts {
         public TMP_InputField rotationZ;
 
         protected override void AwakeImpl() {
-            MeshComponent.OnMeshChange += SetCanvasMiddle;
+            GraphicComponent.OnMeshChange += SetCanvasMiddle;
         }
 
         protected override void StartImpl() {
@@ -57,12 +57,13 @@ namespace Script.Component.Parts {
         public void ResetPosition() {
             var position = Vector3.zero;
             ObjectInstance.position = position;
-            ObjectUtils.GetCanvas(ObjectInstance).transform.position = ObjectUtils.GetObjectCenter(ObjectInstance);
+            SetCanvasMiddle();
             SetPosition(position);
         }
 
         public void ResetRotation() {
             ObjectInstance.rotation = Quaternion.Euler(Vector3.zero);
+            SetCanvasMiddle();
             SetRotation(ObjectInstance);
         }
 
@@ -126,7 +127,7 @@ namespace Script.Component.Parts {
         }
 
         private void OnDestroy() {
-            MeshComponent.OnMeshChange -= SetCanvasMiddle;
+            GraphicComponent.OnMeshChange -= SetCanvasMiddle;
         }
 
     }

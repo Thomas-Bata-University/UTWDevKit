@@ -100,6 +100,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MeshComponent
       objectReference: {fileID: 0}
+    - target: {fileID: 7243059543783346092, guid: dc97b06ed48a9d943b69d2dcff3a5578, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9081045230014989391, guid: dc97b06ed48a9d943b69d2dcff3a5578, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
