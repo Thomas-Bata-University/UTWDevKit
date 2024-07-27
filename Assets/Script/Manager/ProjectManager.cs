@@ -3,7 +3,6 @@ using System.IO;
 using Script.Enum;
 using Script.Static;
 using SimpleFileBrowser;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -20,13 +19,19 @@ namespace Script.Manager {
 
         private const string ControlFile = "controlFile"; //File for UTW project confirmation
 
-        private const string HullFolder = "hull";
-        private const string TurretFolder = "turret";
-        private const string SuspensionFolder = "suspension";
-        private const string WeaponryFolder = "weaponry";
-        private const string ResourceFolder = "resource";
+        private const string HullFolder = "Hull";
+        private const string TurretFolder = "Turret";
+        private const string SuspensionFolder = "Suspension";
+        private const string WeaponryFolder = "Weaponry";
+        private const string ResourceFolder = "Resources";
+
+        //Resources
+        public const string MeshFolder = "Mesh";
+        public const string MaterialFolder = "Material";
 
         public TankPartType partType = TankPartType.Hull;
+
+        private string _projectPath;
 
         private void Awake() {
             if (Instance == null) {
@@ -36,6 +41,9 @@ namespace Script.Manager {
             else {
                 Destroy(gameObject);
             }
+
+            Debug.developerConsoleVisible = true;
+            Debug.developerConsoleEnabled = true;
         }
 
         #region Create project
@@ -50,6 +58,7 @@ namespace Script.Manager {
             if (!Directory.Exists(path)) {
                 Directory.CreateDirectory(path);
                 Debug.Log($"Created {path}");
+                _projectPath = path;
 
                 CreateFolders(path);
 
@@ -73,6 +82,9 @@ namespace Script.Manager {
             CreateDirectory(path, SuspensionFolder);
             CreateDirectory(path, WeaponryFolder);
             CreateDirectory(path, ResourceFolder);
+
+            CreateDirectory(path, Path.Combine(ResourceFolder, MeshFolder));
+            CreateDirectory(path, Path.Combine(ResourceFolder, MaterialFolder));
         }
 
         private void CreateDirectory(string path, string folderName) {
@@ -92,6 +104,8 @@ namespace Script.Manager {
         private void OnProjectOpen(string path) {
             if (File.Exists(Path.Combine(path, ControlFile))) {
                 Debug.Log("Selected: " + path);
+                _projectPath = path;
+
                 SceneManager.LoadScene(SceneNames.Preview);
             }
             else {
@@ -100,6 +114,10 @@ namespace Script.Manager {
         }
 
         #endregion
+
+        public string GetResourceFolder(string folder) {
+            return Path.Combine(_projectPath, ResourceFolder, folder);
+        }
 
     }
 } //END

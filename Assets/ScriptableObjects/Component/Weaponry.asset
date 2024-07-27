@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   componentData:
   - componentType: 0
-    prefab: {fileID: 2608078969406280013, guid: b0be25457a1d17c45a899f9f3f3c5ce4, type: 3}
+    prefab: {fileID: 1628706485522603181, guid: 10a08ad7a907cdf4d87ed0f5ce9b30fd, type: 3}

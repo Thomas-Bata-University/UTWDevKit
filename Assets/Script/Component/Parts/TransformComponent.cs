@@ -29,8 +29,8 @@ namespace Script.Component.Parts {
         }
 
         protected override void StartImpl() {
-            SetPosition(objectInstance.position);
-            SetRotation(objectInstance);
+            SetPosition(ObjectInstance.position);
+            SetRotation(ObjectInstance);
 
             RegisterListeners(positionX, Axis.X, OnPositionChanged);
             RegisterListeners(positionY, Axis.Y, OnPositionChanged);
@@ -48,36 +48,36 @@ namespace Script.Component.Parts {
 
         protected override void UpdateImpl() {
             if (IsObjectMoving) {
-                SetPosition(objectInstance.position);
-                SetRotation(objectInstance);
+                SetPosition(ObjectInstance.position);
+                SetRotation(ObjectInstance);
             }
         }
 
         public void ResetPosition() {
             var position = Vector3.zero;
-            objectInstance.position = position;
-            ObjectUtils.GetCanvas(objectInstance).transform.position = position;
+            ObjectInstance.position = position;
+            ObjectUtils.GetCanvas(ObjectInstance).transform.position = position;
             SetPosition(position);
         }
 
         public void ResetRotation() {
-            objectInstance.rotation = Quaternion.Euler(Vector3.zero);
-            SetRotation(objectInstance);
+            ObjectInstance.rotation = Quaternion.Euler(Vector3.zero);
+            SetRotation(ObjectInstance);
         }
 
         private void OnPositionChanged(string value, Axis axis) {
-            var position = CalculateTransform(value, axis, objectInstance.position);
+            var position = CalculateTransform(value, axis, ObjectInstance.position);
 
-            objectInstance.position = position;
-            ObjectUtils.GetCanvas(objectInstance).transform.position = position;
+            ObjectInstance.position = position;
+            ObjectUtils.GetCanvas(ObjectInstance).transform.position = position;
             SetPosition(position);
         }
 
         private void OnRotationChanged(string value, Axis axis) {
-            var rotation = Quaternion.Euler(CalculateTransform(value, axis, objectInstance.rotation.eulerAngles));
+            var rotation = Quaternion.Euler(CalculateTransform(value, axis, ObjectInstance.rotation.eulerAngles));
 
-            objectInstance.rotation = rotation;
-            SetRotation(objectInstance);
+            ObjectInstance.rotation = rotation;
+            SetRotation(ObjectInstance);
         }
 
         private Vector3 CalculateTransform(string value, Axis axis, Vector3 transform) {

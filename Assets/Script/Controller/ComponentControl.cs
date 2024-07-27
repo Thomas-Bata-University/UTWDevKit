@@ -53,8 +53,7 @@ namespace Script.Controller {
             KeyValuePair<ComponentType, GameObject> pair) {
             var component = Instantiate(pair.Value, componentGrid.transform.GetChild(0).GetChild(0));
             var componentScript = component.GetComponent<AComponent>();
-            componentScript.Initialize(selectedObject);
-            component.name = componentScript.componentName;
+            componentScript.Initialize(selectedObject, componentGrid);
             return null;
         }
 

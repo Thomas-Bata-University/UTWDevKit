@@ -19,6 +19,7 @@ namespace Script.Controller {
         //--------------------------------------------------------------------------------------------------------------------------
 
         public static UnityAction<Transform> OnObjectSelected;
+        public static UnityAction<Transform> OnObjectDeselected;
         public static UnityAction<Transform> OnObjectRemove;
 
         public ComponentControl componentControl;
@@ -123,6 +124,7 @@ namespace Script.Controller {
                 if (_selectedObject != hit.transform || _selectedObject is null) {
                     //Old
                     Outline(_selectedObject, false);
+                    OnObjectDeselected?.Invoke(_selectedObject);
                     componentControl.DisableComponents(_selectedObject);
                     ObjectUtils.SetCanvasVisible(_selectedObject);
 
@@ -144,6 +146,7 @@ namespace Script.Controller {
 
         private void DeselectObject() {
             if (_selectedObject is null) return;
+            OnObjectDeselected?.Invoke(_selectedObject);
             ObjectUtils.SetCanvasVisible(_selectedObject);
             componentControl.DisableComponents(_selectedObject);
             Outline(_selectedObject, false);

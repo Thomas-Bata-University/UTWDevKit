@@ -6,8 +6,8 @@ namespace Script.Component {
     /// </summary>
     public abstract class AComponent : MonoBehaviour {
 
-        public string componentName;
-        [HideInInspector] public Transform objectInstance; //Selected object of the component
+        protected Transform ObjectInstance; //Selected object of the component
+        protected GameObject ComponentGrid;
 
         protected bool IsObjectMoving;
 
@@ -19,19 +19,19 @@ namespace Script.Component {
         }
 
         private void Start() {
-            _lastPosition = objectInstance.position;
-            _lastRotation = objectInstance.rotation;
+            _lastPosition = ObjectInstance.position;
+            _lastRotation = ObjectInstance.rotation;
 
             StartImpl();
         }
 
         private void Update() {
-            if (objectInstance.position != _lastPosition) {
-                _lastPosition = objectInstance.position;
+            if (ObjectInstance.position != _lastPosition) {
+                _lastPosition = ObjectInstance.position;
                 IsObjectMoving = true;
             }
-            else if (objectInstance.rotation != _lastRotation) {
-                _lastRotation = objectInstance.rotation;
+            else if (ObjectInstance.rotation != _lastRotation) {
+                _lastRotation = ObjectInstance.rotation;
                 IsObjectMoving = true;
             }
             else {
@@ -47,8 +47,9 @@ namespace Script.Component {
 
         protected abstract void UpdateImpl();
 
-        public void Initialize(Transform objectInstance) {
-            this.objectInstance = objectInstance;
+        public void Initialize(Transform objectInstance, GameObject componentGrid) {
+            this.ObjectInstance = objectInstance;
+            this.ComponentGrid = componentGrid;
         }
 
     }
