@@ -15,6 +15,8 @@ using Object = UnityEngine.Object;
 namespace Script.Component.Parts {
     public class MeshComponent : AComponent {
 
+        public static Action OnMeshChange;
+
         public GameObject recordPrefab;
         private GameObject _selectedRecord;
 
@@ -51,6 +53,7 @@ namespace Script.Component.Parts {
             ObjectInstance.GetComponent<MeshFilter>().sharedMesh = mesh;
 
             meshName.text = mesh.name;
+            OnMeshChange?.Invoke();
         }
 
         public void OpenMeshPanel() {

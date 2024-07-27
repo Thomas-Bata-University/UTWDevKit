@@ -46,6 +46,10 @@ namespace Script.Utils {
             go.SetActive(!go.activeSelf);
         }
 
+        public static Vector3 GetObjectCenter(Transform selectedObject) {
+            return selectedObject.GetComponent<Renderer>().bounds.center;
+        }
+
         #endregion
 
     }

@@ -277,7 +277,7 @@ namespace Script.Controller {
 
         private void SetPosition(Vector3 pos) {
             _selectedObject.position = pos;
-            ObjectUtils.GetCanvas(_selectedObject).position = pos;
+            ObjectUtils.GetCanvas(_selectedObject).position = ObjectUtils.GetObjectCenter(_selectedObject);
         }
 
         private void SetRotation(Vector3 axis, float angle) {
