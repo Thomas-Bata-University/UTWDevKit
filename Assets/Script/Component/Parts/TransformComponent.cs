@@ -75,7 +75,7 @@ namespace Script.Component.Parts {
             var position = CalculateTransform(value, axis, ObjectInstance.position);
 
             ObjectInstance.position = position;
-            ObjectUtils.GetCanvas(ObjectInstance).transform.position = position;
+            SetCanvasMiddle();
             SetPosition(position);
         }
 

@@ -6067,6 +6067,7 @@ GameObject:
   - component: {fileID: 2552162988460634414}
   - component: {fileID: 4932754951552252769}
   - component: {fileID: 3917720234183494675}
+  - component: {fileID: 8447394352612736770}
   m_Layer: 0
   m_Name: Object
   m_TagString: Selectable
@@ -6179,6 +6180,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &8447394352612736770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1035464122856996995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c875ede919e0b3946a521274add1e8b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Notes: Combine all meshes from all childs, set materials.
 --- !u!1 &1283775737355099925
 GameObject:
   m_ObjectHideFlags: 0

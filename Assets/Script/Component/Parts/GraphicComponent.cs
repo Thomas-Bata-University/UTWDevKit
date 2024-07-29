@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 using GLTFast;
 using Script.Controller;
 using Script.Manager;
+using Script.Mesh;
 using Script.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Logger = Script.Log.Logger;
-using Object = UnityEngine.Object;
 
 namespace Script.Component.Parts {
     public class GraphicComponent : AComponent {
@@ -27,39 +27,21 @@ namespace Script.Component.Parts {
         private GameObject _selectedRecord;
 
         [Header("Mesh Filter")]
-        public Mesh defaultMesh;
         public TextMeshProUGUI meshName;
 
-        [Header("Material")]
-        public Material defaultMaterial;
-        public TextMeshProUGUI materialName;
-
         /// <summary>
-        /// KEY - Button (record) | VALUE - Prefab
+        /// KEY - Button (record) | VALUE - Data about imported .gltf object
         /// </summary>
-        private Dictionary<GameObject, Object> _contentData = new();
+        private Dictionary<GameObject, Data> _contentData = new();
 
         protected override void AwakeImpl() {
             ObjectControl.OnObjectDeselected += Deselect;
         }
 
         protected override void StartImpl() {
-            SetMesh(defaultMesh);
-            SetMaterial(defaultMaterial);
         }
 
         protected override void UpdateImpl() {
-        }
-
-        #region Mesh
-
-        private void SetMesh(Mesh mesh) {
-            ObjectInstance.GetComponent<MeshCollider>().sharedMesh = null;
-            ObjectInstance.GetComponent<MeshCollider>().sharedMesh = mesh;
-            ObjectInstance.GetComponent<MeshFilter>().sharedMesh = mesh;
-
-            meshName.text = mesh.name;
-            OnMeshChange?.Invoke();
         }
 
         public void OpenMeshPanel() {
@@ -76,14 +58,26 @@ namespace Script.Component.Parts {
             ComponentGridUtils.GetCancelButton(data).onClick.AddListener(Cancel);
         }
 
-        private void SelectMesh() {
-            var prefab = _contentData[_selectedRecord];
-            SetMesh((Mesh)prefab);
+        private async void SelectMesh() {
+            var data = _contentData[_selectedRecord];
+
+            var parent = data.ParentObject;
+            if (parent.childCount > 0 && parent.GetChild(0) is not null)
+                Destroy(parent.GetChild(0).gameObject);
+
+            await data.Gltf.InstantiateMainSceneAsync(data.Instantiator);
+
+            meshName.text = data.FileName;
+
+            parent.name = "Graphic";
+            parent.GetComponent<CombineMeshes>().Merge();
+
+            OnMeshChange?.Invoke();
 
             Cancel();
         }
 
-        private async Task<Mesh> ImportMesh(string path) {
+        private async Task<Data> ImportMesh(string path) {
             var gltf = new GltfImport();
             var settings = new ImportSettings {
                 GenerateMipMaps = true,
@@ -94,76 +88,15 @@ namespace Script.Component.Parts {
             var success = await gltf.Load(path, settings);
 
             if (success) {
-                if (gltf.GetMeshes().Length <= 0) {
-                    Logger.Instance.LogMessage($"Missing material in {Path.GetFileName(path)}. Cannot import.");
-                    return null;
-                }
-
-                return gltf.GetMeshes()[0]; //TODO what to do when multiple meshes
+                var instantiator = new GameObjectInstantiator(gltf, ObjectInstance);
+                return new Data(gltf, ObjectInstance, instantiator, Path.GetFileName(path));
             }
 
-            Logger.Instance.LogMessage("Cannot select this mesh.");
-            throw new Exception();
+            Logger.Instance.LogMessage($"Cannot select this mesh. {path}");
+            throw new Exception($"Cannot select this mesh. {path}");
         }
 
-        #endregion
-
-        #region Material
-
-        private void SetMaterial(Material material) {
-            ObjectInstance.GetComponent<MeshRenderer>().material = material;
-
-            materialName.text = material.name;
-        }
-
-        public void OpenMaterialPanel() {
-            var data = ComponentGridUtils.GetSelectData(ComponentGrid);
-            data.SetActive(true);
-
-            ComponentGridUtils.GetName(data).text = "Select Material";
-
-            LoadData(data, ProjectManager.MaterialFolder, ImportMaterial);
-
-            ComponentGridUtils.GetSelectButton(data).onClick.RemoveAllListeners();
-
-            ComponentGridUtils.GetSelectButton(data).onClick.AddListener(SelectMaterial);
-            ComponentGridUtils.GetCancelButton(data).onClick.AddListener(Cancel);
-        }
-
-        private void SelectMaterial() {
-            var material = _contentData[_selectedRecord];
-            SetMaterial((Material)material);
-
-            Cancel();
-        }
-
-        private async Task<Material> ImportMaterial(string path) {
-            var gltf = new GltfImport();
-            var settings = new ImportSettings {
-                GenerateMipMaps = true,
-                AnisotropicFilterLevel = 3,
-                NodeNameMethod = NameImportMethod.OriginalUnique
-            };
-
-            var success = await gltf.Load(path, settings);
-
-            if (success) {
-                if (gltf.GetMaterial() is null) {
-                    Logger.Instance.LogMessage($"Missing material in {Path.GetFileName(path)}. Cannot import.");
-                    return null;
-                }
-
-                return gltf.GetMaterial();
-            }
-
-            Logger.Instance.LogMessage("Cannot select this material.");
-            throw new Exception();
-        }
-
-        #endregion
-
-        private async void LoadData<T>(GameObject data, string folder, Func<string, Task<T>> callback)
-            where T : Object {
+        private async void LoadData(GameObject data, string folder, Func<string, Task<Data>> callback) {
             var content = ComponentGridUtils.GetContent(data);
 
             ClearData();
@@ -201,6 +134,22 @@ namespace Script.Component.Parts {
             if (deselectedObject == ObjectInstance) {
                 Cancel();
             }
+        }
+
+        private class Data {
+
+            public GltfImport Gltf { get; set; }
+            public Transform ParentObject { get; set; }
+            public GameObjectInstantiator Instantiator { get; set; }
+            public string FileName { get; set; }
+
+            public Data(GltfImport gltf, Transform parentObject, GameObjectInstantiator instantiator, string fileName) {
+                Gltf = gltf;
+                ParentObject = parentObject;
+                Instantiator = instantiator;
+                FileName = fileName;
+            }
+
         }
 
     }
