@@ -28,12 +28,22 @@ namespace Script.Log {
         }
 
         public void LogMessage(string message, float duration = 3f) {
+            Message(message, duration);
+        }
+
+        public void LogErrorMessage(string message, float duration = 3f) {
+            Message(message, duration, Color.red);
+        }
+
+        private void Message(string message, float duration, Color color = default) {
+            if (color == default) color = Color.white;
+
             if (_activeMessageCoroutine != null) {
                 StopCoroutine(_activeMessageCoroutine);
             }
 
             logText.text = message;
-
+            logText.color = color;
             _activeMessageCoroutine = StartCoroutine(RemoveMessageAfterTime(duration));
         }
 

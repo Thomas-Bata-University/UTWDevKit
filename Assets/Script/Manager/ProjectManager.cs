@@ -26,8 +26,7 @@ namespace Script.Manager {
         private const string ResourceFolder = "Resources";
 
         //Resources
-        public const string MeshFolder = "Mesh";
-        public const string MaterialFolder = "Material";
+        public const string GraphicFolder = "Graphic";
 
         public TankPartType partType = TankPartType.Hull;
 
@@ -83,8 +82,7 @@ namespace Script.Manager {
             CreateDirectory(path, WeaponryFolder);
             CreateDirectory(path, ResourceFolder);
 
-            CreateDirectory(path, Path.Combine(ResourceFolder, MeshFolder));
-            CreateDirectory(path, Path.Combine(ResourceFolder, MaterialFolder));
+            CreateDirectory(path, Path.Combine(ResourceFolder, GraphicFolder));
         }
 
         private void CreateDirectory(string path, string folderName) {

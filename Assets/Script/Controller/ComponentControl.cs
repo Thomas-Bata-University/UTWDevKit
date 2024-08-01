@@ -36,6 +36,7 @@ namespace Script.Controller {
 
         private void OnObjectRemove(Transform selectedObject) {
             DisableComponents(selectedObject);
+            Destroy(_componentList[selectedObject].ComponentGrid);
             _componentList.Remove(selectedObject);
         }
 

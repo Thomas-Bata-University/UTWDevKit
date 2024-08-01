@@ -1,5 +1,6 @@
 using System;
 using Script.Enum;
+using Script.Task;
 using Script.Utils;
 using TMPro;
 using UnityEngine;
@@ -57,14 +58,16 @@ namespace Script.Component.Parts {
         public void ResetPosition() {
             var position = Vector3.zero;
             ObjectInstance.position = position;
-            SetCanvasMiddle();
             SetPosition(position);
+
+            SetCanvasMiddle();
         }
 
         public void ResetRotation() {
             ObjectInstance.rotation = Quaternion.Euler(Vector3.zero);
-            SetCanvasMiddle();
             SetRotation(ObjectInstance);
+
+            SetCanvasMiddle();
         }
 
         private void SetCanvasMiddle() {
@@ -75,8 +78,9 @@ namespace Script.Component.Parts {
             var position = CalculateTransform(value, axis, ObjectInstance.position);
 
             ObjectInstance.position = position;
-            SetCanvasMiddle();
             SetPosition(position);
+
+            SetCanvasMiddle();
         }
 
         private void OnRotationChanged(string value, Axis axis) {
@@ -84,6 +88,8 @@ namespace Script.Component.Parts {
 
             ObjectInstance.rotation = rotation;
             SetRotation(ObjectInstance);
+
+            SetCanvasMiddle();
         }
 
         private Vector3 CalculateTransform(string value, Axis axis, Vector3 transform) {

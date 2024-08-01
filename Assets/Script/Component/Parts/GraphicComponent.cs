@@ -50,7 +50,7 @@ namespace Script.Component.Parts {
 
             ComponentGridUtils.GetName(data).text = "Select Mesh";
 
-            LoadData(data, ProjectManager.MeshFolder, ImportMesh);
+            LoadData(data, ProjectManager.GraphicFolder, ImportMesh);
 
             ComponentGridUtils.GetSelectButton(data).onClick.RemoveAllListeners();
 
@@ -78,22 +78,27 @@ namespace Script.Component.Parts {
         }
 
         private async Task<Data> ImportMesh(string path) {
-            var gltf = new GltfImport();
-            var settings = new ImportSettings {
-                GenerateMipMaps = true,
-                AnisotropicFilterLevel = 3,
-                NodeNameMethod = NameImportMethod.OriginalUnique
-            };
+            try {
+                var gltf = new GltfImport();
+                var settings = new ImportSettings {
+                    GenerateMipMaps = true,
+                    AnisotropicFilterLevel = 3,
+                    NodeNameMethod = NameImportMethod.OriginalUnique
+                };
 
-            var success = await gltf.Load(path, settings);
+                var success = await gltf.Load(path, settings);
 
-            if (success) {
-                var instantiator = new GameObjectInstantiator(gltf, ObjectInstance);
-                return new Data(gltf, ObjectInstance, instantiator, Path.GetFileName(path));
+                if (success) {
+                    var instantiator = new GameObjectInstantiator(gltf, ObjectInstance);
+                    return new Data(gltf, ObjectInstance, instantiator, Path.GetFileName(path));
+                }
+
+                throw new Exception($"An error occured during importing GLTF file: {path}");
             }
-
-            Logger.Instance.LogMessage($"Cannot select this mesh. {path}");
-            throw new Exception($"Cannot select this mesh. {path}");
+            catch (Exception e) {
+                Logger.Instance.LogErrorMessage(e.Message, 5f);
+                return null;
+            }
         }
 
         private async void LoadData(GameObject data, string folder, Func<string, Task<Data>> callback) {

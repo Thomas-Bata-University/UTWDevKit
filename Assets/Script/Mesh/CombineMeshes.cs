@@ -39,7 +39,11 @@ namespace Script.Mesh {
                     CombineInstance ci = new CombineInstance();
                     ci.mesh = childMeshFilters[i].sharedMesh;
                     ci.subMeshIndex = j;
-                    ci.transform = childMeshFilters[i].transform.localToWorldMatrix;
+
+                    Matrix4x4 childToParentMatrix =
+                        transform.worldToLocalMatrix * childMeshFilters[i].transform.localToWorldMatrix;
+                    ci.transform = childToParentMatrix;
+
                     combineInstances[materialIndex].Add(ci);
                 }
 
