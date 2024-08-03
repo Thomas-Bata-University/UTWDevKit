@@ -29,6 +29,18 @@ namespace Script.Component.Parts {
         [Header("Mesh Filter")]
         public TextMeshProUGUI meshName;
 
+        [Header("Select data hierarchy")]
+        private GameObject _data;
+        private Button _selectButton;
+        private Button _cancelButton;
+        private TMP_InputField _filterInput;
+
+        [Header("Metadata")]
+        public TextMeshProUGUI filePath;
+        public TextMeshProUGUI fileExtension;
+        public TextMeshProUGUI fileSize;
+        public TextMeshProUGUI fileLastChange;
+
         /// <summary>
         /// KEY - Button (record) | VALUE - Data about imported .gltf object
         /// </summary>
@@ -39,23 +51,37 @@ namespace Script.Component.Parts {
         }
 
         protected override void StartImpl() {
+            _data = ComponentGridUtils.GetSelectData(ComponentGrid);
+            _selectButton = ComponentGridUtils.GetSelectButton(_data);
+            _cancelButton = ComponentGridUtils.GetCancelButton(_data);
+            _filterInput = ComponentGridUtils.GetFilterInput(_data);
         }
 
         protected override void UpdateImpl() {
         }
 
+        #region Filter
+
+        private void OnInputChanged(string input) {
+            string lowerInput = input.ToLower();
+            foreach (var kvp in _contentData) {
+                kvp.Key.SetActive(kvp.Value.FileName.ToLower().Contains(lowerInput));
+            }
+        }
+
+        #endregion
+
         public void OpenMeshPanel() {
-            var data = ComponentGridUtils.GetSelectData(ComponentGrid);
-            data.SetActive(true);
+            _selectButton.interactable = false;
+            _data.SetActive(true);
 
-            ComponentGridUtils.GetName(data).text = "Select Mesh";
+            ComponentGridUtils.GetName(_data).text = "Select Mesh";
 
-            LoadData(data, ProjectManager.GraphicFolder, ImportMesh);
+            LoadData(ProjectManager.GraphicFolder, ImportMesh);
 
-            ComponentGridUtils.GetSelectButton(data).onClick.RemoveAllListeners();
-
-            ComponentGridUtils.GetSelectButton(data).onClick.AddListener(SelectMesh);
-            ComponentGridUtils.GetCancelButton(data).onClick.AddListener(Cancel);
+            _selectButton.onClick.AddListener(SelectMesh);
+            _cancelButton.onClick.AddListener(Cancel);
+            _filterInput.onValueChanged.AddListener(OnInputChanged);
         }
 
         private async void SelectMesh() {
@@ -74,23 +100,25 @@ namespace Script.Component.Parts {
 
             OnMeshChange?.Invoke();
 
+            SetMetadata(data);
+
             Cancel();
         }
 
         private async Task<Data> ImportMesh(string path) {
-            try {
-                var gltf = new GltfImport();
-                var settings = new ImportSettings {
-                    GenerateMipMaps = true,
-                    AnisotropicFilterLevel = 3,
-                    NodeNameMethod = NameImportMethod.OriginalUnique
-                };
+            var gltf = new GltfImport();
+            var settings = new ImportSettings {
+                GenerateMipMaps = true,
+                AnisotropicFilterLevel = 3,
+                NodeNameMethod = NameImportMethod.OriginalUnique
+            };
 
+            try {
                 var success = await gltf.Load(path, settings);
 
                 if (success) {
                     var instantiator = new GameObjectInstantiator(gltf, ObjectInstance);
-                    return new Data(gltf, ObjectInstance, instantiator, Path.GetFileName(path));
+                    return new Data(gltf, ObjectInstance, instantiator, Path.GetFileName(path), path);
                 }
 
                 throw new Exception($"An error occured during importing GLTF file: {path}");
@@ -101,8 +129,8 @@ namespace Script.Component.Parts {
             }
         }
 
-        private async void LoadData(GameObject data, string folder, Func<string, Task<Data>> callback) {
-            var content = ComponentGridUtils.GetContent(data);
+        private async void LoadData(string folder, Func<string, Task<Data>> callback) {
+            var content = ComponentGridUtils.GetContent(_data);
 
             ClearData();
 
@@ -117,9 +145,14 @@ namespace Script.Component.Parts {
                 var fileName = Path.GetFileName(filePath);
                 var record = Instantiate(recordPrefab, content.transform);
                 record.GetComponentInChildren<TextMeshProUGUI>().text = fileName;
-                record.GetComponent<Button>().onClick.AddListener(() => _selectedRecord = record);
+                record.GetComponent<Button>().onClick.AddListener(() => SelectRecord(record));
                 _contentData.Add(record, import);
             }
+        }
+
+        private void SelectRecord(GameObject record) {
+            _selectedRecord = record;
+            _selectButton.interactable = true;
         }
 
         private void ClearData() {
@@ -130,9 +163,21 @@ namespace Script.Component.Parts {
             _contentData.Clear();
         }
 
+        private void SetMetadata(Data data) {
+            FileInfo fileInfo = new FileInfo(data.FilePath);
+            filePath.text = "Path: " + data.FilePath;
+            fileExtension.text = "Extension: " + Path.GetExtension(data.FilePath);
+            fileSize.text = "Size: " + ByteUtils.ToMB(fileInfo.Length) + " MB";
+            fileLastChange.text = "Last change: " + fileInfo.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss");
+        }
+
         private void Cancel() {
             var data = ComponentGridUtils.GetSelectData(ComponentGrid);
             data.SetActive(false);
+
+            _selectButton.onClick.RemoveAllListeners();
+            _cancelButton.onClick.RemoveAllListeners();
+            _filterInput.onValueChanged.RemoveAllListeners();
         }
 
         private void Deselect(Transform deselectedObject) {
@@ -147,12 +192,14 @@ namespace Script.Component.Parts {
             public Transform ParentObject { get; set; }
             public GameObjectInstantiator Instantiator { get; set; }
             public string FileName { get; set; }
+            public string FilePath { get; set; }
 
-            public Data(GltfImport gltf, Transform parentObject, GameObjectInstantiator instantiator, string fileName) {
+            public Data(GltfImport gltf, Transform parentObject, GameObjectInstantiator instantiator, string fileName, string filePath) {
                 Gltf = gltf;
                 ParentObject = parentObject;
                 Instantiator = instantiator;
                 FileName = fileName;
+                FilePath = filePath;
             }
 
         }

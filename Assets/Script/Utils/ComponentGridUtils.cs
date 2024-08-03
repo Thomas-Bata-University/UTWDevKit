@@ -25,5 +25,9 @@ namespace Script.Utils {
             return data.transform.GetChild(3).GetComponent<Button>();
         }
 
+        public static TMP_InputField GetFilterInput(GameObject data) {
+            return data.transform.GetChild(4).GetComponent<TMP_InputField>();
+        }
+
     }
 } //END

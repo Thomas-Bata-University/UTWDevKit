@@ -5,6 +5,7 @@ using Script.Static;
 using SimpleFileBrowser;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Logger = Script.Log.Logger;
 
 namespace Script.Manager {
     public class ProjectManager : MonoBehaviour {
@@ -108,6 +109,7 @@ namespace Script.Manager {
             }
             else {
                 Debug.LogError("Cannot open. This is not a UTW project.");
+                Logger.Instance.LogErrorMessage("Cannot open. This is not a UTW project.");
             }
         }
 
