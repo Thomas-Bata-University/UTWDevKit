@@ -71,7 +71,7 @@ namespace Script.Controller {
             buttons[index].color = active;
             createButtonText.text = "Create new " + ((TankPartType)_activeTab);
 
-            _parent = tabs[index].transform.GetChild(0).GetChild(0); //TODO refactor
+            _parent = tabs[index].transform.GetChild(0).GetChild(0); //Get content
 
             ProjectManager.Instance.partType = (TankPartType)_activeTab;
 
@@ -107,7 +107,7 @@ namespace Script.Controller {
             ClearData();
 
             string path = ProjectManager.Instance.GetActiveProjectFolder();
-            string[] files = Directory.GetFiles(path, "*" + ProjectUtils.JSON);
+            string[] files = Directory.GetFiles(path, $"*{ProjectUtils.JSON}");
 
             foreach (var file in files) {
                 var go = Instantiate(dataPrefab, _parent);
@@ -162,6 +162,10 @@ namespace Script.Controller {
             }
 
             _data.Clear();
+        }
+
+        public void GoBack() {
+            SceneManager.LoadScene(SceneNames.MainMenu);
         }
 
     }

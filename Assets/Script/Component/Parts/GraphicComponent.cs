@@ -108,8 +108,11 @@ namespace Script.Component.Parts {
             SaveManager.Instance.GetData(ObjectInstance).pathToGraphic = data.FilePath;
         }
 
-        private async void OnMeshLoad(string path, Transform objectInstance) {  //TODO refactor
-            if (String.IsNullOrEmpty(path) || ObjectInstance != objectInstance) return;
+        private async void OnMeshLoad(string path, Transform objectInstance) { //TODO refactor
+            if (String.IsNullOrEmpty(path) || ObjectInstance != objectInstance) {
+                OnMeshChange?.Invoke();
+                return;
+            }
             var gltf = new GltfImport();
             var settings = new ImportSettings {
                 GenerateMipMaps = true,
@@ -172,7 +175,7 @@ namespace Script.Component.Parts {
 
             var resourceFolder = ProjectManager.Instance.GetResourceFolder(folder);
 
-            string[] files = Directory.GetFiles(resourceFolder, "*.gltf");
+            string[] files = Directory.GetFiles(resourceFolder, $"*{ProjectUtils.GLTF}");
 
             foreach (string filePath in files) {
                 var import = await callback(filePath);

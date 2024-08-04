@@ -1,9 +1,10 @@
 using UnityEngine;
 
 namespace Script.Utils {
-    public class ProjectUtils {
+    public static class ProjectUtils {
 
         public const string JSON = ".json";
+        public const string GLTF = ".gltf";
 
     }
 }//END

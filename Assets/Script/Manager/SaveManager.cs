@@ -71,8 +71,15 @@ namespace Script.Manager {
                 string json = File.ReadAllText(fullPath);
                 DataList loadedData = JsonUtility.FromJson<DataList>(json);
 
+                SetIds(loadedData);
                 SetCamera(loadedData);
                 SetTankPartObject(loadedData);
+            }
+        }
+
+        private void SetIds(DataList loadedData) {
+            foreach (var id in loadedData.ids) {
+                UniqueIdGenerator.Instance.SetCurrentID(id);
             }
         }
 
@@ -87,6 +94,7 @@ namespace Script.Manager {
 
             foreach (var data in loadedData.items) {
                 var go = Instantiate(objectPrefab);
+                go.name = data.objectName;
 
                 var selectable = ObjectUtils.GetReference(go.transform);
                 selectable.position = data.position;
@@ -143,6 +151,7 @@ namespace Script.Manager {
 
             //Main data
             public string projectName; //Not name of the whole project
+            public List<IDs> ids = new();
 
             //Camera
             public Vector3 cameraPos;
@@ -153,7 +162,6 @@ namespace Script.Manager {
 
         }
 
-
         [Serializable]
         public class DataToSave {
 
@@ -163,6 +171,14 @@ namespace Script.Manager {
             public Vector3 rotation;
             public string pathToGraphic;
             public string Tag;
+
+        }
+
+        [Serializable]
+        public class IDs {
+
+            public TankPartType type;
+            public int count;
 
         }
 

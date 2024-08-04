@@ -1,3 +1,4 @@
+using Script.Enum;
 using Script.Static;
 
 namespace Script.Task {
@@ -5,6 +6,7 @@ namespace Script.Task {
 
         protected override void AwakeImpl() {
             Tag = Tags.Part.Turret;
+            partType = TankPartType.Turret;
         }
 
         protected override void StartImpl() {

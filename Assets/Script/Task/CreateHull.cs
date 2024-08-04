@@ -1,3 +1,4 @@
+using Script.Enum;
 using Script.Static;
 using UnityEngine;
 
@@ -6,6 +7,7 @@ namespace Script.Task {
 
         protected override void AwakeImpl() {
             Tag = Tags.Part.Hull;
+            partType = TankPartType.Hull;
         }
 
         protected override void StartImpl() {
@@ -16,6 +18,7 @@ namespace Script.Task {
 
         public override void Create() {
             EnableMaxCheck(base.Create);
+
         }
 
     }

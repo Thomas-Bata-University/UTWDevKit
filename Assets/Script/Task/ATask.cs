@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Script.Controller;
 using Script.Enum;
 using Script.Manager;
@@ -79,10 +80,23 @@ namespace Script.Task {
             var go = Instantiate(prefab, Vector3.zero, Quaternion.identity);
             OnPartCreation?.Invoke(go.transform, components.Initialize());
             SetText(++ActualCount);
+            int id = UniqueIdGenerator.Instance.GetNextID(partType);
+
+            go.name = $"{prefab.name}_{id}";
 
             var saveData = SaveManager.Instance.GetData(ObjectUtils.GetReference(go.transform));
             saveData.type = partType;
             saveData.Tag = Tag;
+            saveData.objectName = go.name;
+
+            var coreData = SaveManager.Instance.GetCoreData();
+            try {
+                var getId = coreData.ids.First(ds => ds.type.Equals(partType));
+                getId.count = ++id;
+            }
+            catch {
+                coreData.ids.Add(new SaveManager.IDs() { type = partType, count = ++id });
+            }
         }
 
         private void RemoveObject(Transform selectedObject) {
