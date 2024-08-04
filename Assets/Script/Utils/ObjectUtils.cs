@@ -14,6 +14,10 @@ namespace Script.Utils {
             return tankPart.GetChild(0);
         }
 
+        public static Transform GetTag(Transform tankPart) {
+            return tankPart.GetChild(1);
+        }
+
         public static Transform GetCanvas(Transform selectedObject) {
             return selectedObject.parent.GetChild(2);
         }

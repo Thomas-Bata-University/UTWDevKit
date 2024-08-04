@@ -32,17 +32,21 @@ namespace Script.Controller {
         private void Start() {
             foreach (var entry in mainParts) {
                 if (entry.partType == ProjectManager.Instance.partType) {
-                    Initialize(entry.part.tasks);
+                    Initialize(entry.part.tasks, entry.partType);
                     return;
                 }
             }
         }
 
-        private void Initialize(List<GameObject> tasks) {
+        private void Initialize(List<GameObject> tasks, TankPartType partType) {
             foreach (var task in tasks) {
                 var taskObject = Instantiate(task, parent);
+                var aTask = taskObject.GetComponent<ATask>();
+                aTask.partType = partType;
                 this.tasks.Add(taskObject.GetComponent<ATask>());
             }
+
+            SaveManager.Instance.Load();
         }
 
     }

@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using Script.Controller;
 using Script.Enum;
+using Script.Manager;
 using Script.SO;
 using Script.Utils;
 using TMPro;
@@ -32,6 +32,8 @@ namespace Script.Task {
         public TextMeshProUGUI countText;
         protected int ActualCount, MaxCount = 1;
 
+        public TankPartType partType;
+
         private void Awake() {
             ObjectControl.OnObjectRemove += RemoveObject;
             AwakeImpl();
@@ -40,6 +42,7 @@ namespace Script.Task {
         private void Start() {
             text.text = description;
             isCompleteImage.color = _isComplete ? Color.green : Color.red;
+            ActualCount = GameObject.FindGameObjectsWithTag(Tag).Length;
             SetText(ActualCount);
 
             StartImpl();
@@ -76,6 +79,10 @@ namespace Script.Task {
             var go = Instantiate(prefab, Vector3.zero, Quaternion.identity);
             OnPartCreation?.Invoke(go.transform, components.Initialize());
             SetText(++ActualCount);
+
+            var saveData = SaveManager.Instance.GetData(ObjectUtils.GetReference(go.transform));
+            saveData.type = partType;
+            saveData.Tag = Tag;
         }
 
         private void RemoveObject(Transform selectedObject) {

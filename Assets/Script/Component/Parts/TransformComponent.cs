@@ -1,6 +1,6 @@
 using System;
 using Script.Enum;
-using Script.Task;
+using Script.Manager;
 using Script.Utils;
 using TMPro;
 using UnityEngine;
@@ -114,6 +114,8 @@ namespace Script.Component.Parts {
             positionX.text = position.x.ToString(FORMAT);
             positionY.text = position.y.ToString(FORMAT);
             positionZ.text = position.z.ToString(FORMAT);
+
+            SaveManager.Instance.GetData(ObjectInstance).position = position;
         }
 
         private void SetRotation(Transform rotation) {
@@ -122,6 +124,8 @@ namespace Script.Component.Parts {
             rotationX.text = InspectorRotation(angle.x).ToString(FORMAT);
             rotationY.text = InspectorRotation(angle.y).ToString(FORMAT);
             rotationZ.text = InspectorRotation(angle.z).ToString(FORMAT);
+
+            SaveManager.Instance.GetData(ObjectInstance).rotation = angle;
         }
 
         private float InspectorRotation(float angle) {

@@ -1,4 +1,5 @@
 using Script.Buttons;
+using Script.Manager;
 using Script.Static;
 using UnityEngine;
 using UnityEngine.Events;
@@ -46,6 +47,10 @@ namespace Script.Controller {
 
         public void Back() {
             SceneManager.LoadScene(SceneNames.Preview);
+        }
+
+        public void Save() {
+            SaveManager.Instance.Save();
         }
 
     }

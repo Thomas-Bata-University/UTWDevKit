@@ -9,7 +9,6 @@ namespace Script.Task {
         }
 
         protected override void StartImpl() {
-            Create();
         }
 
         protected override void UpdateImpl() {

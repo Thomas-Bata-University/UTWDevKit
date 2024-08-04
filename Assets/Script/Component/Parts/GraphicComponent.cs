@@ -48,6 +48,7 @@ namespace Script.Component.Parts {
 
         protected override void AwakeImpl() {
             ObjectControl.OnObjectDeselected += Deselect;
+            SaveManager.OnMeshLoad += OnMeshLoad;
         }
 
         protected override void StartImpl() {
@@ -103,6 +104,41 @@ namespace Script.Component.Parts {
             SetMetadata(data);
 
             Cancel();
+
+            SaveManager.Instance.GetData(ObjectInstance).pathToGraphic = data.FilePath;
+        }
+
+        private async void OnMeshLoad(string path, Transform objectInstance) {  //TODO refactor
+            if (String.IsNullOrEmpty(path) || ObjectInstance != objectInstance) return;
+            var gltf = new GltfImport();
+            var settings = new ImportSettings {
+                GenerateMipMaps = true,
+                AnisotropicFilterLevel = 3,
+                NodeNameMethod = NameImportMethod.OriginalUnique
+            };
+
+            try {
+                var success = await gltf.Load(path, settings);
+
+                if (success) {
+                    var instantiator = new GameObjectInstantiator(gltf, ObjectInstance);
+                    await gltf.InstantiateMainSceneAsync(instantiator);
+
+                    var data = new Data(gltf, ObjectInstance, instantiator, Path.GetFileName(path), path);
+
+                    meshName.text = data.FileName;
+
+                    ObjectInstance.name = "Graphic";
+                    ObjectInstance.GetComponent<CombineMeshes>().Merge();
+
+                    OnMeshChange?.Invoke();
+
+                    SetMetadata(data);
+                }
+            }
+            catch (Exception e) {
+                Logger.Instance.LogErrorMessage(e.Message, 5f);
+            }
         }
 
         private async Task<Data> ImportMesh(string path) {
@@ -194,7 +230,8 @@ namespace Script.Component.Parts {
             public string FileName { get; set; }
             public string FilePath { get; set; }
 
-            public Data(GltfImport gltf, Transform parentObject, GameObjectInstantiator instantiator, string fileName, string filePath) {
+            public Data(GltfImport gltf, Transform parentObject, GameObjectInstantiator instantiator, string fileName,
+                string filePath) {
                 Gltf = gltf;
                 ParentObject = parentObject;
                 Instantiator = instantiator;
@@ -202,6 +239,11 @@ namespace Script.Component.Parts {
                 FilePath = filePath;
             }
 
+        }
+
+        private void OnDestroy() {
+            ObjectControl.OnObjectDeselected -= Deselect;
+            SaveManager.OnMeshLoad -= OnMeshLoad;
         }
 
     }

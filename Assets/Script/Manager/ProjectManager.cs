@@ -41,9 +41,6 @@ namespace Script.Manager {
             else {
                 Destroy(gameObject);
             }
-
-            Debug.developerConsoleVisible = true;
-            Debug.developerConsoleEnabled = true;
         }
 
         #region Create project
@@ -65,7 +62,8 @@ namespace Script.Manager {
                 SceneManager.LoadScene(SceneNames.Preview);
             }
             else {
-                Debug.LogError("Project with this name already exists");
+                Logger.Instance.LogErrorMessage("Project with this name already exists.");
+                Debug.LogError("Project with this name already exists.");
             }
         }
 
@@ -117,6 +115,28 @@ namespace Script.Manager {
 
         public string GetResourceFolder(string folder) {
             return Path.Combine(_projectPath, ResourceFolder, folder);
+        }
+
+        public string GetActiveProjectFolder() {
+            string part;
+            switch (partType) {
+                case TankPartType.Hull:
+                    part = HullFolder;
+                    break;
+                case TankPartType.Turret:
+                    part = TurretFolder;
+                    break;
+                case TankPartType.Suspension:
+                    part = SuspensionFolder;
+                    break;
+                case TankPartType.Weaponry:
+                    part = WeaponryFolder;
+                    break;
+                default:
+                    throw new Exception("Missing part type");
+            }
+
+            return Path.Combine(_projectPath, part);
         }
 
     }

@@ -23,7 +23,7 @@ namespace Script.SO {
         }
 
         [Header("Component")]
-        public PrefabEntry[] componentData;
+        public List<PrefabEntry> componentData;
 
         public Dictionary<ComponentType, GameObject> Initialize() {
             foreach (var entry in componentData) {

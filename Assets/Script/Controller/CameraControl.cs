@@ -1,3 +1,4 @@
+using Script.Manager;
 using UnityEngine;
 
 namespace Script.Controller {
@@ -60,11 +61,15 @@ namespace Script.Controller {
             currentSpeed = Mathf.MoveTowards(currentSpeed, maxSpeed * multiplicator, acceleration * Time.deltaTime);
 
             _mainCamera.transform.Translate(moveDirection * (currentSpeed * Time.deltaTime));
+
+            SaveManager.Instance.GetCoreData().cameraPos = _mainCamera.transform.position;
         }
 
         private void MoveCameraWithMouse() {
             _mainCamera.transform.Translate(-Input.GetAxisRaw("Mouse X") * Time.deltaTime * dragSpeed,
                 -Input.GetAxisRaw("Mouse Y") * Time.deltaTime * dragSpeed, 0);
+
+            SaveManager.Instance.GetCoreData().cameraPos = _mainCamera.transform.position;
         }
 
         private void RotateAround(Transform center) {
@@ -78,6 +83,7 @@ namespace Script.Controller {
             cameraTransform.RotateAround(position, cameraTransform.right, -mouseY);
 
             orientation.rotation = Quaternion.Inverse(cameraTransform.rotation);
+            SaveManager.Instance.GetCoreData().cameraRot = _mainCamera.transform.rotation.eulerAngles;
         }
 
         private void Zoom() {

@@ -60,6 +60,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Turret Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 8856652437337991340, guid: 86a84c956a146044282a07f091a47d4a, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

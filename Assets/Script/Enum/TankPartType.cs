@@ -5,6 +5,7 @@ namespace Script.Enum {
         Turret,
         Suspension,
         Weaponry,
+        Plate,
 
     }
 } //END

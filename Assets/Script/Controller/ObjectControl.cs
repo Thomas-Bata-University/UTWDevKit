@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Script.Buttons;
 using Script.Enum;
+using Script.Manager;
 using Script.Static;
 using Script.Utils;
 using UnityEngine;
@@ -353,6 +354,7 @@ namespace Script.Controller {
 
         public void RemoveObject() {
             OnObjectRemove?.Invoke(_selectedObject);
+            SaveManager.Instance.Remove(_selectedObject);
             Destroy(_selectedObject.parent.gameObject);
             _selectedObject = null;
             deleteButton.SetActive(false);

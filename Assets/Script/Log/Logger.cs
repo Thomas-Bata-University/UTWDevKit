@@ -1,6 +1,7 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Script.Log {
     public class Logger : MonoBehaviour {
@@ -25,10 +26,16 @@ namespace Script.Log {
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
             }
+
+            SceneManager.activeSceneChanged += StopCoroutine;
         }
 
         public void LogMessage(string message, float duration = 3f) {
             Message(message, duration);
+        }
+
+        public void LogSuccessfulMessage(string message, float duration = 3f) {
+            Message(message, duration, Color.green);
         }
 
         public void LogErrorMessage(string message, float duration = 3f) {
@@ -38,9 +45,7 @@ namespace Script.Log {
         private void Message(string message, float duration, Color color = default) {
             if (color == default) color = Color.white;
 
-            if (_activeMessageCoroutine != null) {
-                StopCoroutine(_activeMessageCoroutine);
-            }
+            StopCoroutine();
 
             logText.text = message;
             logText.color = color;
@@ -51,6 +56,21 @@ namespace Script.Log {
             yield return new WaitForSeconds(duration);
             logText.text = "";
             _activeMessageCoroutine = null;
+        }
+
+        private void StopCoroutine() {
+            if (_activeMessageCoroutine != null) {
+                StopCoroutine(_activeMessageCoroutine);
+            }
+        }
+
+        private void StopCoroutine(Scene oldScene, Scene newScene) {
+            StopCoroutine();
+            logText.text = null;
+        }
+
+        private void OnDestroy() {
+            SceneManager.activeSceneChanged -= StopCoroutine;
         }
 
     }
