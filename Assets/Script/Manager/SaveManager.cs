@@ -7,10 +7,8 @@ using Script.Enum;
 using Script.Mesh;
 using Script.SO;
 using Script.Utils;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 using Logger = Script.Log.Logger;
 
 namespace Script.Manager {
@@ -53,6 +51,11 @@ namespace Script.Manager {
         }
 
         public void Save() {
+            if (!Data.ContainsKey(_dataList.projectName)) {
+                Debug.Log("INFO - Cannot save, there are no data");
+                return;
+            }
+
             string path = ProjectManager.Instance.GetActiveProjectFolder();
 
             _dataList.items = new List<DataToSave>();
@@ -70,6 +73,11 @@ namespace Script.Manager {
         }
 
         public void Load() {
+            if (!Data.ContainsKey(_dataList.projectName)) {
+                Debug.Log("INFO - Cannot load, there are no data");
+                return;
+            }
+
             string path = ProjectManager.Instance.GetActiveProjectFolder();
             string fullPath = Path.Combine(path, _dataList.fileName);
             if (File.Exists(fullPath)) {
@@ -88,6 +96,7 @@ namespace Script.Manager {
                 DataList loadedData = JsonUtility.FromJson<DataList>(json);
 
                 var parent = new GameObject(Path.GetFileNameWithoutExtension(fullPath)).transform;
+                parent.gameObject.SetActive(false);
 
                 foreach (var data in loadedData.items) {
                     var go = Instantiate(objectPrefab, parent);
@@ -104,8 +113,6 @@ namespace Script.Manager {
                     else {
                         selectable.GetComponent<MeshFilter>().mesh = defaultMesh;
                     }
-
-                    parent.gameObject.SetActive(false);
 
                     GetData(Path.GetFileNameWithoutExtension(fullPath)).Add(selectable, MapData(data));
                 }
@@ -133,11 +140,7 @@ namespace Script.Manager {
             var componentControl = FindObjectOfType<ComponentControl>();
 
             foreach (var kvp in Data[_dataList.projectName]) {
-                var outline = kvp.Key.AddComponent<Outline>();
-                outline.OutlineMode = Outline.Mode.OutlineVisible;
-                outline.enabled = false;
-                outline.OutlineColor = Color.yellow;
-                outline.OutlineWidth = 4;
+                ProjectUtils.CreateOutline(kvp.Key.gameObject);
 
                 ComponentSO component = GetComponents(kvp.Value.type);
                 componentControl.CreateGridForObject(kvp.Key.parent, component.Initialize());

@@ -84,7 +84,10 @@ namespace Script.Task {
 
             go.name = $"{prefab.name}_{id}";
 
-            var saveData = SaveManager.Instance.GetData(ObjectUtils.GetReference(go.transform));
+            var selectable = ObjectUtils.GetReference(go.transform);
+            ProjectUtils.CreateOutline(selectable.gameObject);
+
+            var saveData = SaveManager.Instance.GetData(selectable);
             saveData.type = partType;
             saveData.Tag = Tag;
             saveData.objectName = go.name;

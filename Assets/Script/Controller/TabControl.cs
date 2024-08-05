@@ -66,6 +66,8 @@ namespace Script.Controller {
                 tab.SetActive(false);
             }
 
+
+
             tabs[index].SetActive(true);
             _activeTab = index;
 
@@ -161,13 +163,15 @@ namespace Script.Controller {
         }
 
         private void View(Transform parent) {
+            cameraBounds.Restart();
+
             foreach (var p in _bounds.Keys) {
                 p.gameObject.SetActive(false);
             }
 
-            parent.gameObject.SetActive(true);
             var bounds = cameraBounds.GetTargetsBounds(_bounds[parent]);
             cameraBounds.SetCamera(bounds);
+            parent.gameObject.SetActive(true);
         }
 
         private void Edit(string fileName, Transform parent) {
@@ -212,7 +216,12 @@ namespace Script.Controller {
                 Destroy(data);
             }
 
+            foreach (var kvp in _bounds) {
+                Destroy(kvp.Key.gameObject);
+            }
+
             _data.Clear();
+            _bounds.Clear();
         }
 
         public void GoBack() {
