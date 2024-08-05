@@ -1,12 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Script.Controller;
 using Script.Enum;
+using Script.Mesh;
 using Script.SO;
 using Script.Utils;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 using Logger = Script.Log.Logger;
 
 namespace Script.Manager {
@@ -23,7 +27,7 @@ namespace Script.Manager {
 
         public GameObject objectPrefab;
 
-        private Dictionary<Transform, DataToSave> _data = new();
+        public Dictionary<string, Dictionary<Transform, DataToSave>> Data = new();
         private DataList _dataList = new();
 
         [Serializable]
@@ -35,6 +39,8 @@ namespace Script.Manager {
         }
 
         public Parts[] componentParts;
+
+        public UnityEngine.Mesh defaultMesh; //If we dont find mesh or doesnt exists, use default
 
         private void Awake() {
             if (Instance == null) {
@@ -51,31 +57,65 @@ namespace Script.Manager {
 
             _dataList.items = new List<DataToSave>();
 
-            foreach (var dataItem in _data.Values) {
+            foreach (var dataItem in Data[_dataList.projectName].Values) {
                 DataToSave saveData = MapData(dataItem);
 
                 _dataList.items.Add(saveData);
             }
 
             string json = JsonUtility.ToJson(_dataList, true);
-            File.WriteAllText(Path.Combine(path, _dataList.projectName), json);
+            File.WriteAllText(Path.Combine(path, _dataList.fileName), json);
 
             Logger.Instance.LogMessage("Saved");
         }
 
         public void Load() {
-            _data.Clear();
             string path = ProjectManager.Instance.GetActiveProjectFolder();
-            string fullPath = Path.Combine(path, _dataList.projectName);
+            string fullPath = Path.Combine(path, _dataList.fileName);
             if (File.Exists(fullPath)) {
                 string json = File.ReadAllText(fullPath);
                 DataList loadedData = JsonUtility.FromJson<DataList>(json);
 
                 SetIds(loadedData);
                 SetCamera(loadedData);
-                SetTankPartObject(loadedData);
+                SetTankPartObject();
             }
         }
+
+        public async Task<Transform> Preload(string fullPath) {
+            if (File.Exists(fullPath)) {
+                string json = await File.ReadAllTextAsync(fullPath);
+                DataList loadedData = JsonUtility.FromJson<DataList>(json);
+
+                var parent = new GameObject(Path.GetFileNameWithoutExtension(fullPath)).transform;
+
+                foreach (var data in loadedData.items) {
+                    var go = Instantiate(objectPrefab, parent);
+                    go.name = data.objectName;
+
+                    var selectable = ObjectUtils.GetReference(go.transform);
+                    selectable.position = data.position;
+                    selectable.rotation = Quaternion.Euler(data.rotation);
+
+                    ObjectUtils.GetTag(go.transform).tag = data.Tag;
+                    if (await GltfManager.Instance.OnMeshLoad(data.pathToGraphic, selectable)) {
+                        selectable.GetComponent<CombineMeshes>().Merge();
+                    }
+                    else {
+                        selectable.GetComponent<MeshFilter>().mesh = defaultMesh;
+                    }
+
+                    parent.gameObject.SetActive(false);
+
+                    GetData(Path.GetFileNameWithoutExtension(fullPath)).Add(selectable, MapData(data));
+                }
+
+                return parent;
+            }
+
+            return null;
+        }
+
 
         private void SetIds(DataList loadedData) {
             foreach (var id in loadedData.ids) {
@@ -89,23 +129,20 @@ namespace Script.Manager {
             cameraControl.rotation = Quaternion.Euler(loadedData.cameraRot);
         }
 
-        private void SetTankPartObject(DataList loadedData) {
+        private void SetTankPartObject() {
             var componentControl = FindObjectOfType<ComponentControl>();
 
-            foreach (var data in loadedData.items) {
-                var go = Instantiate(objectPrefab);
-                go.name = data.objectName;
+            foreach (var kvp in Data[_dataList.projectName]) {
+                var outline = kvp.Key.AddComponent<Outline>();
+                outline.OutlineMode = Outline.Mode.OutlineVisible;
+                outline.enabled = false;
+                outline.OutlineColor = Color.yellow;
+                outline.OutlineWidth = 4;
 
-                var selectable = ObjectUtils.GetReference(go.transform);
-                selectable.position = data.position;
-                selectable.rotation = Quaternion.Euler(data.rotation);
-
-                ObjectUtils.GetTag(go.transform).tag = data.Tag;
-
-                ComponentSO component = GetComponents(data.type);
-                componentControl.CreateGridForObject(go.transform, component.Initialize());
-                OnMeshLoad?.Invoke(data.pathToGraphic, selectable);
-                _data.Add(selectable, MapData(data));
+                ComponentSO component = GetComponents(kvp.Value.type);
+                componentControl.CreateGridForObject(kvp.Key.parent, component.Initialize());
+                kvp.Key.parent.parent = null; //TODO maybe we can use parent
+                OnMeshLoad?.Invoke(kvp.Value.pathToGraphic, kvp.Key);
             }
         }
 
@@ -123,16 +160,25 @@ namespace Script.Manager {
             return _dataList;
         }
 
+        public Dictionary<Transform, DataToSave> GetData(string key) {
+            if (Data.TryGetValue(key, out var data)) return data;
+            var newData = new Dictionary<Transform, DataToSave>();
+            Data.Add(key, newData);
+            return newData;
+        }
+
         public DataToSave GetData(Transform key) {
-            if (_data.TryGetValue(key, out var data)) return data;
+            var data1 = GetData(_dataList.projectName);
+
+            if (data1.TryGetValue(key, out var data)) return data;
             var newData = new DataToSave();
-            _data.Add(key, newData);
+            data1.Add(key, newData);
             return newData;
         }
 
         public void Remove(Transform key) {
             Debug.Log($"Object {key.name} deleted from data to save");
-            _data.Remove(key);
+            Data[_dataList.projectName].Remove(key);
         }
 
         private DataToSave MapData(DataToSave data) {
@@ -151,6 +197,7 @@ namespace Script.Manager {
 
             //Main data
             public string projectName; //Not name of the whole project
+            public string fileName;
             public List<IDs> ids = new();
 
             //Camera

@@ -1006,6 +1006,7 @@ MonoBehaviour:
   Notes: Comment
   recordPrefab: {fileID: 3066483277627845647, guid: 5fb45c73684ecab44b555de8c739e6e2, type: 3}
   meshName: {fileID: 4956919676058350244}
+  defaultMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   filePath: {fileID: 7043119235635356219}
   fileExtension: {fileID: 1333824110493561018}
   fileSize: {fileID: 1601948448769900055}

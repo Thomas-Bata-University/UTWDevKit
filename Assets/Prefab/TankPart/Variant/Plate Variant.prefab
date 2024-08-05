@@ -68,6 +68,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: fc52dead6af3b124db0905d0eef8bd69, type: 2}
+    - target: {fileID: 7944423642179520333, guid: 86a84c956a146044282a07f091a47d4a, type: 3}
+      propertyPath: partType
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 8856652437337991340, guid: 86a84c956a146044282a07f091a47d4a, type: 3}
       propertyPath: m_Name
       value: Plate Variant

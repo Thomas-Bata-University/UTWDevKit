@@ -101,66 +101,27 @@ namespace Script.Component.Parts {
 
             OnMeshChange?.Invoke();
 
-            SetMetadata(data);
+            SetMetadata(data.FilePath);
 
             Cancel();
 
             SaveManager.Instance.GetData(ObjectInstance).pathToGraphic = data.FilePath;
         }
 
-        private async void OnMeshLoad(string path, Transform objectInstance) { //TODO refactor
+        private void OnMeshLoad(string path, Transform objectInstance) {
+            OnMeshChange?.Invoke(); //Call to set canvas middle
+
             if (String.IsNullOrEmpty(path) || ObjectInstance != objectInstance) {
-                OnMeshChange?.Invoke();
                 return;
             }
-            var gltf = new GltfImport();
-            var settings = new ImportSettings {
-                GenerateMipMaps = true,
-                AnisotropicFilterLevel = 3,
-                NodeNameMethod = NameImportMethod.OriginalUnique
-            };
 
-            try {
-                var success = await gltf.Load(path, settings);
-
-                if (success) {
-                    var instantiator = new GameObjectInstantiator(gltf, ObjectInstance);
-                    await gltf.InstantiateMainSceneAsync(instantiator);
-
-                    var data = new Data(gltf, ObjectInstance, instantiator, Path.GetFileName(path), path);
-
-                    meshName.text = data.FileName;
-
-                    ObjectInstance.name = "Graphic";
-                    ObjectInstance.GetComponent<CombineMeshes>().Merge();
-
-                    OnMeshChange?.Invoke();
-
-                    SetMetadata(data);
-                }
-            }
-            catch (Exception e) {
-                Logger.Instance.LogErrorMessage(e.Message, 5f);
-            }
+            meshName.text = Path.GetFileNameWithoutExtension(path);
+            SetMetadata(path);
         }
 
         private async Task<Data> ImportMesh(string path) {
-            var gltf = new GltfImport();
-            var settings = new ImportSettings {
-                GenerateMipMaps = true,
-                AnisotropicFilterLevel = 3,
-                NodeNameMethod = NameImportMethod.OriginalUnique
-            };
-
             try {
-                var success = await gltf.Load(path, settings);
-
-                if (success) {
-                    var instantiator = new GameObjectInstantiator(gltf, ObjectInstance);
-                    return new Data(gltf, ObjectInstance, instantiator, Path.GetFileName(path), path);
-                }
-
-                throw new Exception($"An error occured during importing GLTF file: {path}");
+                return await GltfManager.Instance.ImportMesh(path, ObjectInstance);
             }
             catch (Exception e) {
                 Logger.Instance.LogErrorMessage(e.Message, 5f);
@@ -202,10 +163,10 @@ namespace Script.Component.Parts {
             _contentData.Clear();
         }
 
-        private void SetMetadata(Data data) {
-            FileInfo fileInfo = new FileInfo(data.FilePath);
-            filePath.text = "Path: " + data.FilePath;
-            fileExtension.text = "Extension: " + Path.GetExtension(data.FilePath);
+        private void SetMetadata(string filePath) {
+            FileInfo fileInfo = new FileInfo(filePath);
+            this.filePath.text = "Path: " + filePath;
+            fileExtension.text = "Extension: " + Path.GetExtension(filePath);
             fileSize.text = "Size: " + ByteUtils.ToMB(fileInfo.Length) + " MB";
             fileLastChange.text = "Last change: " + fileInfo.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss");
         }
@@ -225,7 +186,7 @@ namespace Script.Component.Parts {
             }
         }
 
-        private class Data {
+        public class Data {
 
             public GltfImport Gltf { get; set; }
             public Transform ParentObject { get; set; }

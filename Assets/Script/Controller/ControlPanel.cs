@@ -1,6 +1,7 @@
 using Script.Buttons;
 using Script.Manager;
 using Script.Static;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -22,12 +23,16 @@ namespace Script.Controller {
 
         public Button activeActionButton;
 
+        public TextMeshProUGUI projectName;
+
         private void Start() {
             OnButtonClickAction(activeActionButton);
 
             foreach (Button button in actionButtons) {
                 button.onClick.AddListener(() => OnButtonClickAction(button));
             }
+
+            projectName.text = SaveManager.Instance.GetCoreData().projectName;
         }
 
         public Action GetAction() {

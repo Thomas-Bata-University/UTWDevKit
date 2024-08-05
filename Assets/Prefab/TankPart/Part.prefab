@@ -6065,7 +6065,6 @@ GameObject:
   - component: {fileID: 1495295778619176859}
   - component: {fileID: 7904089798181251942}
   - component: {fileID: 2552162988460634414}
-  - component: {fileID: 4932754951552252769}
   - component: {fileID: 3917720234183494675}
   - component: {fileID: 8447394352612736770}
   m_Layer: 0
@@ -6140,24 +6139,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &4932754951552252769
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1035464122856996995}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  outlineMode: 0
-  outlineColor: {r: 0.8018868, g: 0.76021075, b: 0.2912513, a: 1}
-  outlineWidth: 6
-  precomputeOutline: 0
-  bakeKeys: []
-  bakeValues: []
 --- !u!64 &3917720234183494675
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -13388,6 +13369,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4572930715176951754}
+  - component: {fileID: 7944423642179520333}
   m_Layer: 0
   m_Name: Tag
   m_TagString: Untagged
@@ -13410,6 +13392,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 303978033924658179}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7944423642179520333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2281777031719663124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4dd13eab4f68e824289be68b8b0db85c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  partType: 0
 --- !u!1 &4557186011751329369
 GameObject:
   m_ObjectHideFlags: 0

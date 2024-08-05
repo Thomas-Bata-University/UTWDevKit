@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Script.Enum;
 using Script.Manager;
+using Script.Other;
 using Script.Static;
 using Script.Utils;
 using TMPro;
@@ -32,6 +34,8 @@ namespace Script.Controller {
         public GameObject dataPrefab;
         private Transform _parent;
         private List<GameObject> _data = new();
+        private Dictionary<Transform, Transform[]> _bounds = new();
+        public BoundCamera cameraBounds;
 
         public GameObject[] tabs;
         public Image[] buttons;
@@ -48,6 +52,7 @@ namespace Script.Controller {
         public Button createNewButton;
         public TMP_InputField newNameInput;
         public GameObject newPanel;
+        private int _minProjectName = 4;
 
         private int _activeTab;
 
@@ -81,48 +86,94 @@ namespace Script.Controller {
         public IEnumerator CreateNewPart() {
             _result = Result.WAIT;
             newPanel.SetActive(true);
+            newNameInput.text = null;
 
             yield return new WaitUntil(() => _result != Result.WAIT);
 
             if (_result.Equals(Result.YES)) {
-                if (String.IsNullOrWhiteSpace(newNameInput.text)) {
-                    newPanel.SetActive(false);
-                    Logger.Instance.LogErrorMessage("Name of the part project cannot be empty!");
-                    _result = Result.NO;
-                }
-                else {
+                if (Validate())
                     LoadScene();
-                }
+            }
+        }
+
+        private bool Validate() {
+            if (String.IsNullOrWhiteSpace(newNameInput.text)) {
+                Logger.Instance.LogErrorMessage("Name of the part project cannot be empty!");
+            }
+            else if (CheckAlreadyExists(newNameInput.text)) {
+                Logger.Instance.LogErrorMessage("Project with this name already exists!");
+            }
+            else if (newNameInput.text.Length < _minProjectName) {
+                Logger.Instance.LogErrorMessage($"Project name cannot be shorter than {_minProjectName}!");
+            }
+            else {
+                return true;
             }
 
             newPanel.SetActive(false);
+            _result = Result.NO;
+            return false;
+        }
+
+        private bool CheckAlreadyExists(string projectName) {
+            string[] files = GetFiles();
+
+            foreach (var file in files) {
+                if (projectName.Equals(Path.GetFileNameWithoutExtension(file))) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void LoadScene() {
-            SaveManager.Instance.GetCoreData().projectName = newNameInput.text + ProjectUtils.JSON;
+            SaveManager.Instance.GetCoreData().projectName = newNameInput.text;
+            SaveManager.Instance.GetCoreData().fileName = newNameInput.text + ProjectUtils.JSON;
             SceneManager.LoadScene(SceneNames.Editor);
         }
 
-        private void CreateContent() {
+        private async void CreateContent() {
             ClearData();
 
-            string path = ProjectManager.Instance.GetActiveProjectFolder();
-            string[] files = Directory.GetFiles(path, $"*{ProjectUtils.JSON}");
+            string[] files = GetFiles();
+
+            SaveManager.Instance.Data.Clear();
 
             foreach (var file in files) {
                 var go = Instantiate(dataPrefab, _parent);
                 go.name = Path.GetFileNameWithoutExtension(file);
 
-                ViewDataUtils.EditButton(go).onClick.AddListener(() => Edit(Path.GetFileName(file)));
+                var parent = await SaveManager.Instance.Preload(file);
+
+                ViewDataUtils.ViewButton(go).onClick.AddListener(() => View(parent));
+                ViewDataUtils.EditButton(go).onClick.AddListener(() => Edit(Path.GetFileName(file), parent));
                 ViewDataUtils.DeleteButton(go).onClick.AddListener(() => StartCoroutine(Delete(file, go)));
-                ViewDataUtils.GetName(go).text = Path.GetFileName(file);
+                ViewDataUtils.GetName(go).text = Path.GetFileNameWithoutExtension(file);
                 _data.Add(go);
+                _bounds.Add(parent,
+                    parent.Cast<Transform>().Select(ObjectUtils.GetReference).ToArray());
             }
         }
 
-        private void Edit(string fileName) {
-            SaveManager.Instance.GetCoreData().projectName = fileName;
-            SceneManager.LoadScene(SceneNames.Editor);
+        private string[] GetFiles() {
+            return Directory.GetFiles(ProjectManager.Instance.GetActiveProjectFolder(), $"*{ProjectUtils.JSON}");
+        }
+
+        private void View(Transform parent) {
+            foreach (var p in _bounds.Keys) {
+                p.gameObject.SetActive(false);
+            }
+
+            parent.gameObject.SetActive(true);
+            var bounds = cameraBounds.GetTargetsBounds(_bounds[parent]);
+            cameraBounds.SetCamera(bounds);
+        }
+
+        private void Edit(string fileName, Transform parent) {
+            SaveManager.Instance.GetCoreData().projectName = Path.GetFileNameWithoutExtension(fileName);
+            SaveManager.Instance.GetCoreData().fileName = fileName;
+            ProjectManager.Instance.MoveObjectToScene(SceneNames.Editor, parent.gameObject);
         }
 
         private IEnumerator Delete(string path, GameObject go) {
@@ -148,10 +199,10 @@ namespace Script.Controller {
                 _data.Remove(go);
                 Destroy(go);
                 File.Delete(path);
-                Logger.Instance.LogSuccessfulMessage($"File {Path.GetFileName(path)} successfully removed.");
+                Logger.Instance.LogSuccessfulMessage($"Project '{Path.GetFileNameWithoutExtension(path)}' successfully deleted.");
             }
             catch (Exception e) {
-                Logger.Instance.LogErrorMessage($"File {Path.GetFileName(path)} cannot be removed.");
+                Logger.Instance.LogErrorMessage($"Project '{Path.GetFileNameWithoutExtension(path)}' cannot be deleted.");
                 Debug.LogError(e);
             }
         }

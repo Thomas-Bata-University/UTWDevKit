@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Suspension
       objectReference: {fileID: 0}
+    - target: {fileID: 7944423642179520333, guid: 86a84c956a146044282a07f091a47d4a, type: 3}
+      propertyPath: partType
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8678605368194562995, guid: 86a84c956a146044282a07f091a47d4a, type: 3}
       propertyPath: m_Mesh
       value: 

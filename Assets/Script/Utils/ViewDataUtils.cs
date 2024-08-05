@@ -9,6 +9,10 @@ namespace Script.Utils {
             return data.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>();
         }
 
+        public static Button ViewButton(GameObject data) {
+            return data.transform.GetChild(1).gameObject.GetComponent<Button>();
+        }
+
         public static Button EditButton(GameObject data) {
             return data.transform.GetChild(2).gameObject.GetComponent<Button>();
         }

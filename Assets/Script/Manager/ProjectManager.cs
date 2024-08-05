@@ -4,6 +4,7 @@ using Script.Enum;
 using Script.Static;
 using SimpleFileBrowser;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using Logger = Script.Log.Logger;
 
@@ -137,6 +138,35 @@ namespace Script.Manager {
             }
 
             return Path.Combine(_projectPath, part);
+        }
+
+        public void MoveObjectToScene(string sceneName, GameObject objectToMove) {
+            //Destroy event system in previous scene
+            EventSystem existingEventSystem = FindObjectOfType<EventSystem>();
+            if (existingEventSystem != null) {
+                Debug.Log($"Destroyed {existingEventSystem.name}");
+                Destroy(existingEventSystem.gameObject);
+            }
+
+            //Destroy all audio listeners in previous scene
+            AudioListener[] audioListeners = FindObjectsOfType<AudioListener>();
+            if (audioListeners.Length > 0) {
+                for (int i = 0; i < audioListeners.Length; i++) {
+                    Debug.Log($"Destroyed {audioListeners[i].name}");
+                    Destroy(audioListeners[i].gameObject);
+                }
+            }
+
+            SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive).completed +=
+                asyncOperation => OnSceneLoaded(asyncOperation, sceneName, objectToMove);
+        }
+
+        private void OnSceneLoaded(AsyncOperation asyncOperation, string sceneName, GameObject objectToMove) {
+            Scene targetScene = SceneManager.GetSceneByName(sceneName);
+
+            SceneManager.MoveGameObjectToScene(objectToMove, targetScene);
+
+            SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene().name);
         }
 
     }

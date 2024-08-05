@@ -1,3 +1,5 @@
+using Script.Enum;
+using Script.Other;
 using UnityEngine;
 
 namespace Script.Utils {
@@ -42,6 +44,10 @@ namespace Script.Utils {
 
         public static string GetType(Transform tankPart) {
             return tankPart.parent.GetChild(1).tag;
+        }
+
+        public static TankPartType GetPartType(Transform tankPart) {
+            return tankPart.parent.GetComponentInChildren<PartType>().partType;
         }
 
         public static void SetCanvasVisible(Transform selectedObject) {
