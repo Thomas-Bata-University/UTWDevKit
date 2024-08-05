@@ -41,6 +41,7 @@ namespace Script.Other {
         }
 
         public void Restart() {
+            info.SetActive(false);
             _camera.targetTexture.Release();
         }
 

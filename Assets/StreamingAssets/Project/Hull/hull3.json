@@ -1,0 +1,74 @@
+{
+    "projectName": "hull3",
+    "fileName": "hull3.json",
+    "ids": [
+        {
+            "type": 0,
+            "count": 4
+        },
+        {
+            "type": 4,
+            "count": 3
+        }
+    ],
+    "cameraPos": {
+        "x": 6.965598106384277,
+        "y": 5.642033100128174,
+        "z": -9.601009368896485
+    },
+    "cameraRot": {
+        "x": 21.99994659423828,
+        "y": 324.2999572753906,
+        "z": -0.000003683296426970628
+    },
+    "items": [
+        {
+            "objectName": "Hull Variant_3",
+            "type": 0,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "C:\\GameDev\\UTW-DevKit\\Assets\\StreamingAssets\\Project\\Resources\\Graphic\\tiger_grey.gltf",
+            "Tag": "Hull"
+        },
+        {
+            "objectName": "Plate Variant_1",
+            "type": 4,
+            "position": {
+                "x": 1.5854535102844239,
+                "y": 1.017014980316162,
+                "z": 0.5991573333740234
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "",
+            "Tag": "Plate"
+        },
+        {
+            "objectName": "Plate Variant_2",
+            "type": 4,
+            "position": {
+                "x": 1.3565969467163087,
+                "y": 0.7988243103027344,
+                "z": 0.0012187957763671876
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "",
+            "Tag": "Plate"
+        }
+    ]
+}

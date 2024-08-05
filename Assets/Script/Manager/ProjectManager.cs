@@ -49,7 +49,8 @@ namespace Script.Manager {
         public void CreateProject() {
             FileBrowser.ShowSaveDialog((paths) => { OnProjectCreate(paths[0]); },
                 () => { Debug.Log("Canceled"); },
-                FileBrowser.PickMode.FilesAndFolders, false, null, "New Project", "Create new project", "Create");
+                FileBrowser.PickMode.FilesAndFolders, false, null, "New Project", "Create new project",
+                "Create");
         }
 
         private void OnProjectCreate(string path) {
@@ -94,9 +95,15 @@ namespace Script.Manager {
         #region Open project
 
         public void OpenProject() {
+            string initialPath = null;
+            
+#if !UNITY_EDITOR && RUN_IN_BUILD
+initialPath = Path.Combine(Application.dataPath, "StreamingAssets");
+#endif
+
             FileBrowser.ShowLoadDialog((paths) => { OnProjectOpen(paths[0]); },
                 () => { Debug.Log("Canceled"); },
-                FileBrowser.PickMode.Folders, false, null, null, "Open project", "Open");
+                FileBrowser.PickMode.Folders, false, initialPath, null, "Open project", "Open");
         }
 
         private void OnProjectOpen(string path) {

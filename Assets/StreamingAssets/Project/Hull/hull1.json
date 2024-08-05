@@ -1,0 +1,38 @@
+{
+    "projectName": "hull1",
+    "fileName": "hull1.json",
+    "ids": [
+        {
+            "type": 0,
+            "count": 2
+        }
+    ],
+    "cameraPos": {
+        "x": 5.539701461791992,
+        "y": 4.392881870269775,
+        "z": -8.917659759521485
+    },
+    "cameraRot": {
+        "x": 19.19996452331543,
+        "y": 329.40008544921877,
+        "z": 0.0000067804535319737628
+    },
+    "items": [
+        {
+            "objectName": "Hull Variant_1",
+            "type": 0,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "C:\\GameDev\\UTW-DevKit\\Assets\\StreamingAssets\\Project\\Resources\\Graphic\\tiger_green.gltf",
+            "Tag": "Hull"
+        }
+    ]
+}

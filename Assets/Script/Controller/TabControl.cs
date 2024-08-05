@@ -62,11 +62,11 @@ namespace Script.Controller {
         }
 
         public void SwitchTab(int index) {
+            cameraBounds.info.SetActive(false);
+
             foreach (var tab in tabs) {
                 tab.SetActive(false);
             }
-
-
 
             tabs[index].SetActive(true);
             _activeTab = index;
@@ -145,13 +145,13 @@ namespace Script.Controller {
             foreach (var file in files) {
                 var go = Instantiate(dataPrefab, _parent);
                 go.name = Path.GetFileNameWithoutExtension(file);
+                ViewDataUtils.GetName(go).text = Path.GetFileNameWithoutExtension(file);
 
                 var parent = await SaveManager.Instance.Preload(file);
 
                 ViewDataUtils.ViewButton(go).onClick.AddListener(() => View(parent));
                 ViewDataUtils.EditButton(go).onClick.AddListener(() => Edit(Path.GetFileName(file), parent));
                 ViewDataUtils.DeleteButton(go).onClick.AddListener(() => StartCoroutine(Delete(file, go)));
-                ViewDataUtils.GetName(go).text = Path.GetFileNameWithoutExtension(file);
                 _data.Add(go);
                 _bounds.Add(parent,
                     parent.Cast<Transform>().Select(ObjectUtils.GetReference).ToArray());
