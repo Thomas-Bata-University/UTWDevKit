@@ -6,6 +6,7 @@ using System.Linq;
 using Script.Enum;
 using Script.Manager;
 using Script.Other;
+using Script.SceneLoad;
 using Script.Static;
 using Script.Utils;
 using TMPro;
@@ -56,24 +57,30 @@ namespace Script.Controller {
 
         private int _activeTab;
 
-        private void Start() {
+        private async void Start() {
             SwitchTab((int)TankPartType.HULL);
             createNewButton.onClick.AddListener((() => StartCoroutine(CreateNewPart())));
 
-            PreloadData();
+            Debug.Log("Preload start");
+            await PreloadData();
+            Debug.Log("Preload done");
+
+            await WaitForFewSeconds(1); //Wait for few seconds to show player state
+            LoadingScreen.Instance.Hide();
         }
 
-        public async void PreloadData() {
-            Debug.Log("Preload start");
-            foreach (var partType in MainParts.GetMainParts()) {
-                await CreateContent(partType);
-            }
-            Debug.Log("Preload done");
-            SceneLoad.LoadingScreen.Instance.Hide();
+        private async MultiThreading.Task PreloadData() {
+            var hull = CreateContent(TankPartType.HULL);
+            var turret = CreateContent(TankPartType.TURRET);
+            var suspension = CreateContent(TankPartType.SUSPENSION);
+            var weaponry = CreateContent(TankPartType.WEAPONRY);
+
+            await MultiThreading.Task.WhenAll(hull, turret, suspension, weaponry);
         }
 
         public void SwitchTab(int index) {
             TankPartType partType = (TankPartType)_activeTab;
+
             cameraBounds.info.SetActive(false);
 
             foreach (var tab in tabs) {
@@ -102,6 +109,11 @@ namespace Script.Controller {
         private async MultiThreading.Task CreateContent(TankPartType partType) {
             string[] files = GetFiles(partType);
 
+            if (files.Length == 0) {
+                UpdateText(partType, $"{partType} - No content found");
+                return;
+            }
+
             int count = 0;
             UpdateCount(partType, count, files.Length);
 
@@ -125,6 +137,8 @@ namespace Script.Controller {
 
                 UpdateCount(partType, ++count, files.Length);
             }
+
+            UpdateText(partType, $"{partType} - DONE ({files.Length})");
         }
 
         private string[] GetFiles(TankPartType partType) {
@@ -141,7 +155,11 @@ namespace Script.Controller {
         }
 
         private void UpdateCount(TankPartType partType, int actualCount, int expectedCount) {
-            SceneLoad.LoadingScreen.Instance.SetText($"Loading {partType} - {actualCount}/{expectedCount}");
+            LoadingScreen.Instance.SetText($"Loading {partType} - {actualCount}/{expectedCount}", partType);
+        }
+
+        private void UpdateText(TankPartType partType, string text) {
+            LoadingScreen.Instance.SetText(text, partType);
         }
 
         private List<GameObject> GetData(TankPartType key) {
@@ -153,6 +171,10 @@ namespace Script.Controller {
 
         public void GoBack() {
             SceneManager.LoadScene(SceneNames.MainMenu);
+        }
+
+        private async MultiThreading.Task WaitForFewSeconds(int seconds = 2) {
+            await MultiThreading.Task.Delay(seconds * 1000);
         }
 
         #region Button actions

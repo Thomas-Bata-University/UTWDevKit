@@ -1,6 +1,7 @@
+using System;
+using Script.Enum;
 using TMPro;
 using UnityEngine;
-using Logger = Script.Log.Logger;
 
 namespace Script.SceneLoad {
     public class LoadingScreen : MonoBehaviour {
@@ -13,7 +14,7 @@ namespace Script.SceneLoad {
 
         public static LoadingScreen Instance { get; private set; }
 
-        [SerializeField] private TextMeshProUGUI logText;
+        [SerializeField] private TextMeshProUGUI hullText, turretText, suspensionText, weaponryText;
         [SerializeField] private GameObject loadingScreen;
 
         private Coroutine _activeMessageCoroutine;
@@ -36,8 +37,23 @@ namespace Script.SceneLoad {
             loadingScreen.SetActive(false);
         }
 
-        public void SetText(string text) {
-            logText.text = text;
+        public void SetText(string text, TankPartType partType) {
+            GetText(partType).text = text;
+        }
+
+        private TextMeshProUGUI GetText(TankPartType partType) {
+            switch (partType) {
+                case TankPartType.HULL:
+                    return hullText;
+                case TankPartType.TURRET:
+                    return turretText;
+                case TankPartType.SUSPENSION:
+                    return suspensionText;
+                case TankPartType.WEAPONRY:
+                    return weaponryText;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(partType), partType, null);
+            }
         }
 
     }
