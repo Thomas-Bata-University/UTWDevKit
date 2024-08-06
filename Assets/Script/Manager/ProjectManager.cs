@@ -61,7 +61,7 @@ namespace Script.Manager {
 
                 CreateFolders(path);
 
-                SceneManager.LoadScene(SceneNames.Preview);
+                AsyncLoad.Instance.Load(SceneNames.Preview);
             }
             else {
                 Logger.Instance.LogErrorMessage("Project with this name already exists.");
@@ -111,7 +111,7 @@ initialPath = Path.Combine(Application.dataPath, "StreamingAssets");
                 Debug.Log("Selected: " + path);
                 _projectPath = path;
 
-                SceneManager.LoadScene(SceneNames.Preview);
+                AsyncLoad.Instance.Load(SceneNames.Preview);
             }
             else {
                 Debug.LogError("Cannot open. This is not a UTW project.");
@@ -126,6 +126,10 @@ initialPath = Path.Combine(Application.dataPath, "StreamingAssets");
         }
 
         public string GetActiveProjectFolder() {
+            return GetActiveProjectFolder(partType);
+        }
+
+        public string GetActiveProjectFolder(TankPartType partType) {
             string part;
             switch (partType) {
                 case TankPartType.HULL:

@@ -76,8 +76,6 @@ namespace Script.Mesh {
             parentMeshCollider.sharedMesh = combinedMesh;
 
             gameObject.SetActive(true);
-
-            Debug.Log($"Mesh merged for gameobject {gameObject.name}");
         }
 
     }

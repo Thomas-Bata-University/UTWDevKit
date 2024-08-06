@@ -13,6 +13,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Logger = Script.Log.Logger;
+using MultiThreading = System.Threading.Tasks;
 
 namespace Script.Controller {
     public class TabControl : MonoBehaviour {
@@ -32,8 +33,7 @@ namespace Script.Controller {
         }
 
         public GameObject dataPrefab;
-        private Transform _parent;
-        private List<GameObject> _data = new();
+        private Dictionary<TankPartType, List<GameObject>> _data = new();
         private Dictionary<Transform, Transform[]> _bounds = new();
         public BoundCamera cameraBounds;
 
@@ -59,9 +59,21 @@ namespace Script.Controller {
         private void Start() {
             SwitchTab((int)TankPartType.HULL);
             createNewButton.onClick.AddListener((() => StartCoroutine(CreateNewPart())));
+
+            PreloadData();
+        }
+
+        public async void PreloadData() {
+            Debug.Log("Preload start");
+            foreach (var partType in MainParts.GetMainParts()) {
+                await CreateContent(partType);
+            }
+            Debug.Log("Preload done");
+            SceneLoad.LoadingScreen.Instance.Hide();
         }
 
         public void SwitchTab(int index) {
+            TankPartType partType = (TankPartType)_activeTab;
             cameraBounds.info.SetActive(false);
 
             foreach (var tab in tabs) {
@@ -76,13 +88,9 @@ namespace Script.Controller {
             }
 
             buttons[index].color = active;
-            createButtonText.text = "Create new " + ((TankPartType)_activeTab);
+            createButtonText.text = "Create new " + partType;
 
-            _parent = tabs[index].transform.GetChild(0).GetChild(0); //Get content
-
-            ProjectManager.Instance.partType = (TankPartType)_activeTab;
-
-            CreateContent();
+            ProjectManager.Instance.partType = partType;
         }
 
         private void LoadScene() {
@@ -91,45 +99,56 @@ namespace Script.Controller {
             SceneManager.LoadScene(SceneNames.Editor);
         }
 
-        private async void CreateContent() {
-            ClearData();
+        private async MultiThreading.Task CreateContent(TankPartType partType) {
+            string[] files = GetFiles(partType);
 
-            string[] files = GetFiles();
+            int count = 0;
+            UpdateCount(partType, count, files.Length);
 
-            SaveManager.Instance.Data.Clear();
+            if (_data.ContainsKey(partType)) return;
+
+            var partTypeParent = new GameObject(partType.ToString()).transform;
 
             foreach (var file in files) {
-                var go = Instantiate(dataPrefab, _parent);
+                var go = Instantiate(dataPrefab, GetParent(partType));
                 go.name = Path.GetFileNameWithoutExtension(file);
                 ViewDataUtils.GetName(go).text = Path.GetFileNameWithoutExtension(file);
 
-                var parent = await SaveManager.Instance.Preload(file);
+                var parent = await SaveManager.Instance.Preload(file, partType, partTypeParent);
 
                 ViewDataUtils.ViewButton(go).onClick.AddListener(() => View(parent));
                 ViewDataUtils.EditButton(go).onClick.AddListener(() => Edit(Path.GetFileName(file), parent));
-                ViewDataUtils.DeleteButton(go).onClick.AddListener(() => StartCoroutine(Delete(file, go)));
-                _data.Add(go);
+                ViewDataUtils.DeleteButton(go).onClick.AddListener(() => StartCoroutine(Delete(file, go, partType)));
+                GetData(partType).Add(go);
                 _bounds.Add(parent,
                     parent.Cast<Transform>().Select(ObjectUtils.GetReference).ToArray());
+
+                UpdateCount(partType, ++count, files.Length);
             }
+        }
+
+        private string[] GetFiles(TankPartType partType) {
+            return Directory.GetFiles(ProjectManager.Instance.GetActiveProjectFolder(partType),
+                $"*{ProjectUtils.JSON}");
         }
 
         private string[] GetFiles() {
             return Directory.GetFiles(ProjectManager.Instance.GetActiveProjectFolder(), $"*{ProjectUtils.JSON}");
         }
 
+        private Transform GetParent(TankPartType partType) {
+            return tabs[(int)partType].transform.GetChild(0).GetChild(0); //Get content
+        }
 
-        private void ClearData() {
-            foreach (var data in _data) {
-                Destroy(data);
-            }
+        private void UpdateCount(TankPartType partType, int actualCount, int expectedCount) {
+            SceneLoad.LoadingScreen.Instance.SetText($"Loading {partType} - {actualCount}/{expectedCount}");
+        }
 
-            foreach (var kvp in _bounds) {
-                Destroy(kvp.Key.gameObject);
-            }
-
-            _data.Clear();
-            _bounds.Clear();
+        private List<GameObject> GetData(TankPartType key) {
+            if (_data.TryGetValue(key, out var data)) return data;
+            var newData = new List<GameObject>();
+            _data.Add(key, newData);
+            return newData;
         }
 
         public void GoBack() {
@@ -149,6 +168,7 @@ namespace Script.Controller {
                 if (Validate())
                     LoadScene();
             }
+
             newPanel.SetActive(false);
         }
 
@@ -165,12 +185,13 @@ namespace Script.Controller {
         }
 
         private void Edit(string fileName, Transform parent) {
+            parent.parent = null; //Remove Part type parent
             SaveManager.Instance.GetCoreData().projectName = Path.GetFileNameWithoutExtension(fileName);
             SaveManager.Instance.GetCoreData().fileName = fileName;
             ProjectManager.Instance.MoveObjectToScene(SceneNames.Editor, parent.gameObject);
         }
 
-        private IEnumerator Delete(string path, GameObject go) {
+        private IEnumerator Delete(string path, GameObject go, TankPartType partType) {
             _result = Result.WAIT;
             deletePanel.SetActive(true);
             deleteInfo.text = $"Are you sure you want to remove {Path.GetFileName(path)}?";
@@ -178,7 +199,7 @@ namespace Script.Controller {
             yield return new WaitUntil(() => _result != Result.WAIT);
 
             if (_result.Equals(Result.YES)) {
-                DeleteFile(path, go);
+                DeleteFile(path, go, partType);
             }
 
             deletePanel.SetActive(false);
@@ -188,9 +209,9 @@ namespace Script.Controller {
             _result = (Result)index;
         }
 
-        private void DeleteFile(string path, GameObject go) {
+        private void DeleteFile(string path, GameObject go, TankPartType partType) {
             try {
-                _data.Remove(go);
+                _data[partType].Remove(go);
                 Destroy(go);
                 File.Delete(path);
                 Logger.Instance.LogSuccessfulMessage(

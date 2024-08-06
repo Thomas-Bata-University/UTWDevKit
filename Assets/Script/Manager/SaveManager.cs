@@ -90,12 +90,13 @@ namespace Script.Manager {
             }
         }
 
-        public async Task<Transform> Preload(string fullPath) {
+        public async Task<Transform> Preload(string fullPath, TankPartType partType, Transform partTypeParent) {
             if (File.Exists(fullPath)) {
                 string json = await File.ReadAllTextAsync(fullPath);
                 DataList loadedData = JsonUtility.FromJson<DataList>(json);
 
                 var parent = new GameObject(Path.GetFileNameWithoutExtension(fullPath)).transform;
+                parent.parent = partTypeParent;
                 parent.gameObject.SetActive(false);
 
                 foreach (var data in loadedData.items) {
@@ -115,6 +116,8 @@ namespace Script.Manager {
                     }
 
                     GetData(Path.GetFileNameWithoutExtension(fullPath)).Add(selectable, MapData(data));
+
+                    Debug.Log($"Preloaded - {partType} - {Path.GetFileNameWithoutExtension(fullPath)}");
                 }
 
                 return parent;
