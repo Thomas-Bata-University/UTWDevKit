@@ -92,6 +92,8 @@ namespace Script.Task {
             saveData.Tag = Tag;
             saveData.objectName = go.name;
 
+            FindObjectOfType<ObjectControl>().SelectObject(selectable);
+
             var coreData = SaveManager.Instance.GetCoreData();
             try {
                 var getId = coreData.ids.First(ds => ds.type.Equals(partType));

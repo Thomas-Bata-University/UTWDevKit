@@ -6,7 +6,7 @@ namespace Script.Task {
 
         protected override void AwakeImpl() {
             Tag = Tags.Part.Plate;
-            partType = TankPartType.Plate;
+            partType = TankPartType.PLATE;
             MaxCount = 1;
         }
 

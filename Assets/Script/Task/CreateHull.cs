@@ -7,7 +7,7 @@ namespace Script.Task {
 
         protected override void AwakeImpl() {
             Tag = Tags.Part.Hull;
-            partType = TankPartType.Hull;
+            partType = TankPartType.HULL;
         }
 
         protected override void StartImpl() {

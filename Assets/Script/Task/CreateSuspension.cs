@@ -6,7 +6,7 @@ namespace Script.Task {
 
         protected override void AwakeImpl() {
             Tag = Tags.Part.Suspension;
-            partType = TankPartType.Suspension;
+            partType = TankPartType.SUSPENSION;
         }
 
         protected override void StartImpl() {

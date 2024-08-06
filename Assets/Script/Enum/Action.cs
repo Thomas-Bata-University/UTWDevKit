@@ -1,8 +1,8 @@
 namespace Script.Enum {
     public enum Action {
 
-        Position,
-        Rotation,
+        POSITION,
+        ROTATION,
 
     }
 } //END

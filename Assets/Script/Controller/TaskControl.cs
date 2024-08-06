@@ -38,6 +38,13 @@ namespace Script.Controller {
             }
         }
 
+        /// <summary>
+        /// There are tasks for each main part.
+        /// 1. Load all tasks for the selected type
+        /// 2. If there are preloaded objects, complete loading
+        ///    If not, nothing is loaded
+        /// </summary>
+        /// <param name="tasks"></param>
         private void Initialize(List<GameObject> tasks) {
             foreach (var task in tasks) {
                 var taskObject = Instantiate(task, parent);

@@ -57,7 +57,7 @@ namespace Script.Controller {
         private int _activeTab;
 
         private void Start() {
-            SwitchTab((int)TankPartType.Hull);
+            SwitchTab((int)TankPartType.HULL);
             createNewButton.onClick.AddListener((() => StartCoroutine(CreateNewPart())));
         }
 
@@ -83,50 +83,6 @@ namespace Script.Controller {
             ProjectManager.Instance.partType = (TankPartType)_activeTab;
 
             CreateContent();
-        }
-
-        public IEnumerator CreateNewPart() {
-            _result = Result.WAIT;
-            newPanel.SetActive(true);
-            newNameInput.text = null;
-
-            yield return new WaitUntil(() => _result != Result.WAIT);
-
-            if (_result.Equals(Result.YES)) {
-                if (Validate())
-                    LoadScene();
-            }
-        }
-
-        private bool Validate() {
-            if (String.IsNullOrWhiteSpace(newNameInput.text)) {
-                Logger.Instance.LogErrorMessage("Name of the part project cannot be empty!");
-            }
-            else if (CheckAlreadyExists(newNameInput.text)) {
-                Logger.Instance.LogErrorMessage("Project with this name already exists!");
-            }
-            else if (newNameInput.text.Length < _minProjectName) {
-                Logger.Instance.LogErrorMessage($"Project name cannot be shorter than {_minProjectName}!");
-            }
-            else {
-                return true;
-            }
-
-            newPanel.SetActive(false);
-            _result = Result.NO;
-            return false;
-        }
-
-        private bool CheckAlreadyExists(string projectName) {
-            string[] files = GetFiles();
-
-            foreach (var file in files) {
-                if (projectName.Equals(Path.GetFileNameWithoutExtension(file))) {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private void LoadScene() {
@@ -160,6 +116,40 @@ namespace Script.Controller {
 
         private string[] GetFiles() {
             return Directory.GetFiles(ProjectManager.Instance.GetActiveProjectFolder(), $"*{ProjectUtils.JSON}");
+        }
+
+
+        private void ClearData() {
+            foreach (var data in _data) {
+                Destroy(data);
+            }
+
+            foreach (var kvp in _bounds) {
+                Destroy(kvp.Key.gameObject);
+            }
+
+            _data.Clear();
+            _bounds.Clear();
+        }
+
+        public void GoBack() {
+            SceneManager.LoadScene(SceneNames.MainMenu);
+        }
+
+        #region Button actions
+
+        private IEnumerator CreateNewPart() {
+            _result = Result.WAIT;
+            newPanel.SetActive(true);
+            newNameInput.text = null;
+
+            yield return new WaitUntil(() => _result != Result.WAIT);
+
+            if (_result.Equals(Result.YES)) {
+                if (Validate())
+                    LoadScene();
+            }
+            newPanel.SetActive(false);
         }
 
         private void View(Transform parent) {
@@ -203,30 +193,51 @@ namespace Script.Controller {
                 _data.Remove(go);
                 Destroy(go);
                 File.Delete(path);
-                Logger.Instance.LogSuccessfulMessage($"Project '{Path.GetFileNameWithoutExtension(path)}' successfully deleted.");
+                Logger.Instance.LogSuccessfulMessage(
+                    $"Project '{Path.GetFileNameWithoutExtension(path)}' successfully deleted.");
             }
             catch (Exception e) {
-                Logger.Instance.LogErrorMessage($"Project '{Path.GetFileNameWithoutExtension(path)}' cannot be deleted.");
+                Logger.Instance.LogErrorMessage(
+                    $"Project '{Path.GetFileNameWithoutExtension(path)}' cannot be deleted.");
                 Debug.LogError(e);
             }
         }
 
-        private void ClearData() {
-            foreach (var data in _data) {
-                Destroy(data);
+        #endregion
+
+        #region Validate
+
+        private bool Validate() {
+            if (String.IsNullOrWhiteSpace(newNameInput.text)) {
+                Logger.Instance.LogErrorMessage("Name of the part project cannot be empty!");
+            }
+            else if (CheckAlreadyExists(newNameInput.text)) {
+                Logger.Instance.LogErrorMessage("Project with this name already exists!");
+            }
+            else if (newNameInput.text.Length < _minProjectName) {
+                Logger.Instance.LogErrorMessage($"Project name cannot be shorter than {_minProjectName}!");
+            }
+            else {
+                return true;
             }
 
-            foreach (var kvp in _bounds) {
-                Destroy(kvp.Key.gameObject);
+            _result = Result.NO;
+            return false;
+        }
+
+        private bool CheckAlreadyExists(string projectName) {
+            string[] files = GetFiles();
+
+            foreach (var file in files) {
+                if (projectName.Equals(Path.GetFileNameWithoutExtension(file))) {
+                    return true;
+                }
             }
 
-            _data.Clear();
-            _bounds.Clear();
+            return false;
         }
 
-        public void GoBack() {
-            SceneManager.LoadScene(SceneNames.MainMenu);
-        }
+        #endregion
 
     }
 } //END

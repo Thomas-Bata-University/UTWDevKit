@@ -1,8 +1,8 @@
 namespace Script.Enum {
     public enum ComponentType {
 
-        Transform,
-        Graphic,
+        TRANSFORM,
+        GRAPHIC,
 
     }
 } //END

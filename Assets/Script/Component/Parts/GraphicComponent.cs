@@ -86,6 +86,7 @@ namespace Script.Component.Parts {
         }
 
         private async void SelectMesh() {
+            DestroyImmediate(ObjectInstance.gameObject.GetComponent<Outline>());
             var data = _contentData[_selectedRecord];
 
             var parent = data.ParentObject;
@@ -106,6 +107,7 @@ namespace Script.Component.Parts {
             Cancel();
 
             SaveManager.Instance.GetData(ObjectInstance).pathToGraphic = data.FilePath;
+            ProjectUtils.CreateOutline(ObjectInstance.gameObject, true);
         }
 
         private void OnMeshLoad(string path, Transform objectInstance) {

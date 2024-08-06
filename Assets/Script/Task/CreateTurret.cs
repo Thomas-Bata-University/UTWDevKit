@@ -6,7 +6,7 @@ namespace Script.Task {
 
         protected override void AwakeImpl() {
             Tag = Tags.Part.Turret;
-            partType = TankPartType.Turret;
+            partType = TankPartType.TURRET;
         }
 
         protected override void StartImpl() {

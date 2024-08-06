@@ -6,7 +6,7 @@ namespace Script.Task {
 
         protected override void AwakeImpl() {
             Tag = Tags.Part.Weaponry;
-            partType = TankPartType.Weaponry;
+            partType = TankPartType.WEAPONRY;
         }
 
         protected override void StartImpl() {

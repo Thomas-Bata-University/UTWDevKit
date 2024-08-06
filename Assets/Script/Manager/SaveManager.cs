@@ -131,9 +131,10 @@ namespace Script.Manager {
         }
 
         private void SetCamera(DataList loadedData) {
-            var cameraControl = FindObjectOfType<CameraControl>().transform;
-            cameraControl.position = loadedData.cameraPos;
-            cameraControl.rotation = Quaternion.Euler(loadedData.cameraRot);
+            var cameraControl = FindObjectOfType<CameraControl>();
+            cameraControl.transform.position = loadedData.cameraPos;
+            cameraControl.transform.rotation = Quaternion.Euler(loadedData.cameraRot);
+            cameraControl.orientation.rotation = Quaternion.Inverse(cameraControl.transform.rotation);
         }
 
         private void SetTankPartObject() {
@@ -198,7 +199,7 @@ namespace Script.Manager {
         [Serializable]
         public class DataList {
 
-            //Main data
+            //Core data
             public string projectName; //Not name of the whole project
             public string fileName;
             public List<IDs> ids = new();

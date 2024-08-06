@@ -80,11 +80,11 @@ namespace Script.Controller {
                 if (IsMovingMouse()) {
                     _isMovingMouse = true;
                     switch (controlPanel.GetAction()) {
-                        case Action.Position: {
+                        case Action.POSITION: {
                             MoveObject();
                         }
                             break;
-                        case Action.Rotation: {
+                        case Action.ROTATION: {
                             RotateObject();
                         }
                             break;
@@ -123,29 +123,33 @@ namespace Script.Controller {
                 if (_selectedObject == hit.transform) return;
 
                 if (_selectedObject != hit.transform || _selectedObject is null) {
-                    //Old
-                    Outline(_selectedObject, false);
-
-                    if (_selectedObject is not null)
-                        OnObjectDeselected?.Invoke(_selectedObject);
-
-                    componentControl.DisableComponents(_selectedObject);
-                    ObjectUtils.SetCanvasVisible(_selectedObject);
-
-                    SetSelectedObject(hit.transform);
-                    deleteButton.SetActive(true);
-
-                    //New
-                    Outline(_selectedObject, true);
-                    componentControl.EnableComponents(_selectedObject);
-                    ObjectUtils.SetCanvasVisible(_selectedObject);
-                    EnableActionGraphic(_selectedObject, controlPanel.GetAction());
+                    SelectObject(hit.transform);
                 }
             }
             else {
                 if (IsPointerOverUI(Tags.ComponentPanel) || IsPointerOverUI(Tags.ControlPanel)) return;
                 DeselectObject();
             }
+        }
+
+        public void SelectObject(Transform selectable) {
+            //Old
+            Outline(_selectedObject, false);
+
+            if (_selectedObject is not null)
+                OnObjectDeselected?.Invoke(_selectedObject);
+
+            componentControl.DisableComponents(_selectedObject);
+            ObjectUtils.SetCanvasVisible(_selectedObject);
+
+            SetSelectedObject(selectable);
+            deleteButton.SetActive(true);
+
+            //New
+            Outline(_selectedObject, true);
+            componentControl.EnableComponents(_selectedObject);
+            ObjectUtils.SetCanvasVisible(_selectedObject);
+            EnableActionGraphic(_selectedObject, controlPanel.GetAction());
         }
 
         private void DeselectObject() {
@@ -162,10 +166,10 @@ namespace Script.Controller {
             if (selectedObject is null) return;
 
             switch (action) {
-                case Action.Position:
+                case Action.POSITION:
                     ObjectUtils.EnableArrows(selectedObject);
                     break;
-                case Action.Rotation:
+                case Action.ROTATION:
                     ObjectUtils.EnableTorus(selectedObject);
                     break;
             }
@@ -203,7 +207,7 @@ namespace Script.Controller {
         private void MoveObject() {
             if (!_isHoldingObject) return;
 
-            Axis axis = _selectedAxis is null ? Axis.Free : _selectedAxis.GetComponent<ButtonAxis>().axis;
+            Axis axis = _selectedAxis is null ? Axis.FREE : _selectedAxis.GetComponent<ButtonAxis>().axis;
 
             var mousePosition = Input.mousePosition;
             mousePosition.z = _distance;
@@ -223,7 +227,7 @@ namespace Script.Controller {
                     newPosition.z = worldPos.z + _offset.z;
                 }
                     break;
-                case Axis.Free: {
+                case Axis.FREE: {
                     var screenPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, _distance);
                     var pos = mainCamera.ScreenToWorldPoint(screenPosition);
                     SetPosition(pos + _offset);
@@ -254,7 +258,7 @@ namespace Script.Controller {
                     rotate = Vector3.forward;
                 }
                     break;
-                case Axis.Free: {
+                case Axis.FREE: {
                     float mouseX = Input.GetAxis("Mouse X") * 2;
                     float mouseY = Input.GetAxis("Mouse Y") * 2;
                     SetRotation(mouseY, -mouseX, 0);

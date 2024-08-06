@@ -4,7 +4,7 @@ namespace Script.Enum {
         X,
         Y,
         Z,
-        Free,
+        FREE,
 
     }
 } //END

@@ -4,13 +4,13 @@ namespace Script.Enum {
     public enum TankPartType {
 
         //Main parts
-        Hull,
-        Turret,
-        Suspension,
-        Weaponry,
+        HULL,
+        TURRET,
+        SUSPENSION,
+        WEAPONRY,
 
         //Others
-        Plate
+        PLATE
 
     }
 
@@ -18,7 +18,7 @@ namespace Script.Enum {
 
         public static List<TankPartType> GetMainParts() {
             return new List<TankPartType>()
-                { TankPartType.Hull, TankPartType.Turret, TankPartType.Suspension, TankPartType.Weaponry };
+                { TankPartType.HULL, TankPartType.TURRET, TankPartType.SUSPENSION, TankPartType.WEAPONRY };
         }
 
     }

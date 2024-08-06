@@ -30,7 +30,7 @@ namespace Script.Manager {
         //Resources
         public const string GraphicFolder = "Graphic";
 
-        public TankPartType partType = TankPartType.Hull;
+        public TankPartType partType = TankPartType.HULL;
 
         private string _projectPath;
 
@@ -96,7 +96,7 @@ namespace Script.Manager {
 
         public void OpenProject() {
             string initialPath = null;
-            
+
 #if !UNITY_EDITOR && RUN_IN_BUILD
 initialPath = Path.Combine(Application.dataPath, "StreamingAssets");
 #endif
@@ -128,16 +128,16 @@ initialPath = Path.Combine(Application.dataPath, "StreamingAssets");
         public string GetActiveProjectFolder() {
             string part;
             switch (partType) {
-                case TankPartType.Hull:
+                case TankPartType.HULL:
                     part = HullFolder;
                     break;
-                case TankPartType.Turret:
+                case TankPartType.TURRET:
                     part = TurretFolder;
                     break;
-                case TankPartType.Suspension:
+                case TankPartType.SUSPENSION:
                     part = SuspensionFolder;
                     break;
-                case TankPartType.Weaponry:
+                case TankPartType.WEAPONRY:
                     part = WeaponryFolder;
                     break;
                 default:
