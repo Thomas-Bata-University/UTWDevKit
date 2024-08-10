@@ -63,11 +63,18 @@ namespace Script.Controller {
         public GameObject newPanel;
         private int _minProjectName = 4;
 
+        [Header("Data")]
+        public TMP_InputField filter;
+        public TextMeshProUGUI countText;
+        private int _count;
+
         private int _activeTab;
+        private TankPartType _partType;
 
         private async void Start() {
             SwitchTab((int)TankPartType.HULL);
             createNewButton.onClick.AddListener((() => StartCoroutine(CreateNewPart())));
+            filter.onValueChanged.AddListener(OnInputChanged);
 
             Debug.Log("Preload start");
             await PreloadData();
@@ -87,8 +94,6 @@ namespace Script.Controller {
         }
 
         public void SwitchTab(int index) {
-            TankPartType partType = (TankPartType)_activeTab;
-
             cameraBounds.info.SetActive(false);
 
             foreach (var tab in tabs) {
@@ -103,15 +108,17 @@ namespace Script.Controller {
             }
 
             buttons[index].color = active;
-            createButtonText.text = "Create new " + partType;
+            _partType = (TankPartType)_activeTab;
+            createButtonText.text = "Create new " + _partType;
 
-            ProjectManager.Instance.partType = partType;
+            ProjectManager.Instance.partType = _partType;
+            OnInputChanged(filter.text);
         }
 
         private void LoadScene() {
             SaveManager.Instance.GetCoreData().projectName = newNameInput.text;
             SaveManager.Instance.GetCoreData().fileName = newNameInput.text + ProjectUtils.JSON;
-            SceneLoadManager.Instance.LoadNewScene(SceneNames.Editor, newNameInput.text, ProjectManager.Instance.partType);
+            SceneLoadManager.Instance.LoadNewScene(SceneNames.Editor, newNameInput.text, _partType);
         }
 
         private async Async.Task CreateContent(TankPartType partType) {
@@ -197,6 +204,27 @@ namespace Script.Controller {
 
         private async Async.Task WaitForFewSeconds(int seconds = 2) {
             await Async.Task.Delay(seconds * 1000);
+        }
+
+        private void OnInputChanged(string input) {
+            _count = 0;
+            if (!_data.ContainsKey(_partType)) {
+                countText.text = $"Found: {_count}";
+                return;
+            }
+
+            string lowerInput = input.ToLower();
+            foreach (var kvp in _data[_partType]) {
+                if (kvp.Key.name.ToLower().Contains(lowerInput)) {
+                    kvp.Value.SetActive(true);
+                    _count++;
+                }
+                else {
+                    kvp.Value.SetActive(false);
+                }
+            }
+
+            countText.text = $"Found: {_count}";
         }
 
         #region Button actions

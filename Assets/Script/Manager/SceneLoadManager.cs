@@ -111,6 +111,14 @@ namespace Script.Manager {
             //     }
             // }
 
+            Scene currentScene = SceneManager.GetActiveScene();
+
+            foreach (GameObject obj in currentScene.GetRootGameObjects()) {
+                obj.SetActive(false);
+            }
+
+            _previewScene = currentScene;
+
             SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive).completed +=
                 asyncOperation => OnSceneLoaded(asyncOperation, sceneName, objectToMove, partType);
         }
@@ -123,13 +131,6 @@ namespace Script.Manager {
         private void Load(string sceneName, GameObject objectToMove, TankPartType partType) {
             OnPreviousSceneLoad?.Invoke();
 
-            Scene currentScene = SceneManager.GetActiveScene();
-
-            foreach (GameObject obj in currentScene.GetRootGameObjects()) {
-                obj.SetActive(false);
-            }
-
-            _previewScene = currentScene;
             _partTypeParent = objectToMove.transform.parent;
             _fileName = objectToMove.name;
             _partType = partType;
@@ -146,6 +147,11 @@ namespace Script.Manager {
 
         public void ActivatePreviousScene() {
             Scene editorScene = SceneManager.GetActiveScene();
+
+            foreach (GameObject obj in editorScene.GetRootGameObjects()) {
+                obj.SetActive(false);
+            }
+
             SceneManager.UnloadSceneAsync(editorScene);
 
             SceneManager.SetActiveScene(_previewScene);

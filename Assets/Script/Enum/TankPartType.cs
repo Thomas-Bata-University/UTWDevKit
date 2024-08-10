@@ -4,10 +4,10 @@ namespace Script.Enum {
     public enum TankPartType {
 
         //Main parts
-        HULL,
-        TURRET,
-        SUSPENSION,
-        WEAPONRY,
+        HULL = 0,
+        TURRET = 1,
+        SUSPENSION = 2,
+        WEAPONRY = 3,
 
         //Others
         PLATE

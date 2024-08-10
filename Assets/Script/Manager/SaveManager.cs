@@ -188,7 +188,7 @@ namespace Script.Manager {
         }
 
         public void Remove(Transform key) {
-            Debug.Log($"Object {key.name} deleted from data to save");
+            Debug.Log($"Object '{key.name}' deleted from data to save");
             Data[_dataList.projectName].Remove(key);
         }
 
