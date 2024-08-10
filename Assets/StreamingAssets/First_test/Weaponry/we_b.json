@@ -1,0 +1,33 @@
+{
+    "projectName": "we_b",
+    "fileName": "we_b.json",
+    "ids": [],
+    "cameraPos": {
+        "x": -4.13408088684082,
+        "y": 4.463739395141602,
+        "z": -1.0830734968185425
+    },
+    "cameraRot": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "items": [
+        {
+            "objectName": "Weaponry Variant_3",
+            "type": 3,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "C:\\GameDev\\UTW-DevKit\\Assets\\StreamingAssets\\First_test\\Resources\\Graphic\\weaponry_brown.gltf",
+            "Tag": "Weaponry"
+        }
+    ]
+}

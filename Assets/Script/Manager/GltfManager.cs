@@ -32,6 +32,11 @@ namespace Script.Manager {
                 return false;
             }
 
+            if (!File.Exists(path)) {
+                Logger.Instance.LogErrorMessage($"Mesh cannot be loaded. File does not exist {path}");
+                return false;
+            }
+
             var gltf = new GltfImport();
             var settings = new ImportSettings {
                 GenerateMipMaps = true,
@@ -45,18 +50,23 @@ namespace Script.Manager {
                 if (success) {
                     var instantiator = new GameObjectInstantiator(gltf, objectInstance);
                     return await gltf.InstantiateMainSceneAsync(instantiator);
-
-                    // return new GraphicComponent.Data(gltf, objectInstance, instantiator, Path.GetFileName(path), path);
                 }
+
+                throw new Exception($"An error occured during importing GLTF file: {path}");
             }
             catch (Exception e) {
-                Logger.Instance.LogErrorMessage(e.Message, 5f);
+                Logger.Instance.LogErrorMessage(e.Message);
             }
 
             return false;
         }
 
         public async Task<GraphicComponent.Data> ImportMesh(string path, Transform objectInstance) {
+            if (!File.Exists(path)) {
+                Logger.Instance.LogErrorMessage($"Mesh cannot be loaded. File does not exist {path}");
+                return null;
+            }
+
             var gltf = new GltfImport();
             var settings = new ImportSettings {
                 GenerateMipMaps = true,
@@ -75,7 +85,7 @@ namespace Script.Manager {
                 throw new Exception($"An error occured during importing GLTF file: {path}");
             }
             catch (Exception e) {
-                Logger.Instance.LogErrorMessage(e.Message, 5f);
+                Logger.Instance.LogErrorMessage(e.Message);
                 return null;
             }
         }

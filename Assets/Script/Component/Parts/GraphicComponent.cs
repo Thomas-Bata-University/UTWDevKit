@@ -127,7 +127,7 @@ namespace Script.Component.Parts {
                 return await GltfManager.Instance.ImportMesh(path, ObjectInstance);
             }
             catch (Exception e) {
-                Logger.Instance.LogErrorMessage(e.Message, 5f);
+                Logger.Instance.LogErrorMessage(e.Message);
                 return null;
             }
         }

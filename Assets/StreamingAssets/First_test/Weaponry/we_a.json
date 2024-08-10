@@ -1,0 +1,50 @@
+{
+    "projectName": "we_a",
+    "fileName": "we_a.json",
+    "ids": [
+        {
+            "type": 0,
+            "count": 4
+        },
+        {
+            "type": 1,
+            "count": 4
+        },
+        {
+            "type": 2,
+            "count": 4
+        },
+        {
+            "type": 3,
+            "count": 3
+        }
+    ],
+    "cameraPos": {
+        "x": 3.8771870136260988,
+        "y": 4.5644965171813969,
+        "z": -0.20516325533390046
+    },
+    "cameraRot": {
+        "x": 27.85000991821289,
+        "y": 311.9499816894531,
+        "z": -0.0000019312351469125135
+    },
+    "items": [
+        {
+            "objectName": "Weaponry Variant_2",
+            "type": 3,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "C:\\GameDev\\Testing\\Stress\\Resources\\Graphic\\weaponry_grey.gltf",
+            "Tag": "Weaponry"
+        }
+    ]
+}

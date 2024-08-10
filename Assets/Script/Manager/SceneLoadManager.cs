@@ -19,7 +19,6 @@ namespace Script.Manager {
 
         public static UnityAction OnPreviousSceneLoad;
 
-        private string _fileName; //Without extension
         private Scene _previewScene;
         private Transform _partTypeParent; //MAIN part parent
         private TankPartType _partType;
@@ -59,30 +58,30 @@ namespace Script.Manager {
 
         #region New scene
 
-        public void LoadNewScene(string sceneName, string name, TankPartType partType) {
-            SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive).completed +=
-                asyncOperation => OnSceneLoaded(asyncOperation, sceneName, name, partType);
-        }
-
-        private void OnSceneLoaded(AsyncOperation asyncOperation, string sceneName, string name,
-            TankPartType partType) {
-            asyncOperation.completed += (op) => { Load(sceneName, name, partType); };
-        }
-
-        private void Load(string sceneName, string name, TankPartType partType) {
-            OnPreviousSceneLoad?.Invoke();
-
+        public void LoadNewScene(string sceneName, TankPartType partType) {
             Scene currentScene = SceneManager.GetActiveScene();
 
             foreach (GameObject obj in currentScene.GetRootGameObjects()) {
                 obj.SetActive(false);
 
-                if (obj.name == partType.ToString())
+                if (obj.name.Equals(partType.ToString()))
                     _partTypeParent = obj.transform;
             }
 
             _previewScene = currentScene;
-            _fileName = name;
+
+            SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive).completed +=
+                asyncOperation => OnSceneLoaded(asyncOperation, sceneName, partType);
+        }
+
+        private void OnSceneLoaded(AsyncOperation asyncOperation, string sceneName,
+            TankPartType partType) {
+            asyncOperation.completed += (op) => { Load(sceneName, partType); };
+        }
+
+        private void Load(string sceneName, TankPartType partType) {
+            OnPreviousSceneLoad?.Invoke();
+
             _partType = partType;
 
             Scene targetScene = SceneManager.GetSceneByName(sceneName);
@@ -95,22 +94,6 @@ namespace Script.Manager {
         #region Load scene
 
         public void LoadEditScene(string sceneName, GameObject objectToMove, TankPartType partType) {
-            // //Destroy event system in previous scene
-            // EventSystem existingEventSystem = FindObjectOfType<EventSystem>();
-            // if (existingEventSystem != null) {
-            //     Debug.Log($"Destroyed {existingEventSystem.name}");
-            //     Destroy(existingEventSystem.gameObject);
-            // }
-            //
-            // //Destroy all audio listeners in previous scene
-            // AudioListener[] audioListeners = FindObjectsOfType<AudioListener>();
-            // if (audioListeners.Length > 0) {
-            //     for (int i = 0; i < audioListeners.Length; i++) {
-            //         Debug.Log($"Destroyed {audioListeners[i].name}");
-            //         Destroy(audioListeners[i].gameObject);
-            //     }
-            // }
-
             Scene currentScene = SceneManager.GetActiveScene();
 
             foreach (GameObject obj in currentScene.GetRootGameObjects()) {
@@ -132,7 +115,6 @@ namespace Script.Manager {
             OnPreviousSceneLoad?.Invoke();
 
             _partTypeParent = objectToMove.transform.parent;
-            _fileName = objectToMove.name;
             _partType = partType;
             objectToMove.transform.parent = null;
 
@@ -165,7 +147,7 @@ namespace Script.Manager {
             }
 
             var asyncLoad = FindObjectOfType<PreviewAsyncPreload>();
-            asyncLoad.UpdateContent(_partType, _fileName, _partTypeParent);
+            asyncLoad.UpdateContent(_partType, SaveManager.Instance.GetCoreData().projectName, _partTypeParent);
 
             OnPreviousSceneLoad?.Invoke();
         }

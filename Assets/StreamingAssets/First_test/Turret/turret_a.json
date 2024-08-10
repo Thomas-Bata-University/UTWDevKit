@@ -1,0 +1,33 @@
+{
+    "projectName": "turret_a",
+    "fileName": "turret_a.json",
+    "ids": [],
+    "cameraPos": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "cameraRot": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "items": [
+        {
+            "objectName": "Turret Variant_2",
+            "type": 1,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "C:\\GameDev\\UTW-DevKit\\Assets\\StreamingAssets\\First_test\\Resources\\Graphic\\turret_grey.gltf",
+            "Tag": "Turret"
+        }
+    ]
+}

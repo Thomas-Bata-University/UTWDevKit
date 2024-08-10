@@ -1,0 +1,33 @@
+{
+    "projectName": "hull_a",
+    "fileName": "hull_a.json",
+    "ids": [],
+    "cameraPos": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "cameraRot": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "items": [
+        {
+            "objectName": "Hull Variant_2",
+            "type": 0,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "C:\\GameDev\\UTW-DevKit\\Assets\\StreamingAssets\\First_test\\Resources\\Graphic\\hull_grey.gltf",
+            "Tag": "Hull"
+        }
+    ]
+}

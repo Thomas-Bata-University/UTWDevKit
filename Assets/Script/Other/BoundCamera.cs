@@ -46,7 +46,8 @@ namespace Script.Other {
 
         public void Restart() {
             info.SetActive(false);
-            _camera.targetTexture.Release();
+            _camera.targetTexture.Release(); //TODO doesnt work
+            _camera.targetTexture.DiscardContents();
         }
 
         private void OnDestroy() {

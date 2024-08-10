@@ -1,0 +1,46 @@
+{
+    "projectName": "sus_b",
+    "fileName": "sus_b.json",
+    "ids": [
+        {
+            "type": 0,
+            "count": 4
+        },
+        {
+            "type": 1,
+            "count": 4
+        },
+        {
+            "type": 2,
+            "count": 4
+        }
+    ],
+    "cameraPos": {
+        "x": -1.6738941669464112,
+        "y": 0.2788918614387512,
+        "z": -5.940263748168945
+    },
+    "cameraRot": {
+        "x": 9.65000057220459,
+        "y": 16.950010299682618,
+        "z": 3.247603785894171e-7
+    },
+    "items": [
+        {
+            "objectName": "Suspension Variant_3",
+            "type": 2,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "",
+            "Tag": "Suspension"
+        }
+    ]
+}

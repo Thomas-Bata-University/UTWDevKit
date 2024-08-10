@@ -1,0 +1,33 @@
+{
+    "projectName": "sus_g",
+    "fileName": "sus_g.json",
+    "ids": [],
+    "cameraPos": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "cameraRot": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "items": [
+        {
+            "objectName": "Suspension Variant_1",
+            "type": 2,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "C:\\GameDev\\UTW-DevKit\\Assets\\StreamingAssets\\First_test\\Resources\\Graphic\\suspension_green.gltf",
+            "Tag": "Suspension"
+        }
+    ]
+}

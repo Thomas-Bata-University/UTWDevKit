@@ -82,9 +82,13 @@ namespace Script.Controller {
 
             await WaitForFewSeconds(1); //Wait for few seconds to show player state
             LoadingScreen.Instance.Hide();
+
+            OnInputChanged(filter.text);
         }
 
         private async Async.Task PreloadData() {
+            SaveManager.Instance.Data.Clear();
+
             var hull = CreateContent(TankPartType.HULL);
             var turret = CreateContent(TankPartType.TURRET);
             var suspension = CreateContent(TankPartType.SUSPENSION);
@@ -118,7 +122,7 @@ namespace Script.Controller {
         private void LoadScene() {
             SaveManager.Instance.GetCoreData().projectName = newNameInput.text;
             SaveManager.Instance.GetCoreData().fileName = newNameInput.text + ProjectUtils.JSON;
-            SceneLoadManager.Instance.LoadNewScene(SceneNames.Editor, newNameInput.text, _partType);
+            SceneLoadManager.Instance.LoadNewScene(SceneNames.Editor, _partType);
         }
 
         private async Async.Task CreateContent(TankPartType partType) {
@@ -209,7 +213,7 @@ namespace Script.Controller {
         private void OnInputChanged(string input) {
             _count = 0;
             if (!_data.ContainsKey(_partType)) {
-                countText.text = $"Found: {_count}";
+                SetCount();
                 return;
             }
 
@@ -224,7 +228,11 @@ namespace Script.Controller {
                 }
             }
 
-            countText.text = $"Found: {_count}";
+            SetCount();
+        }
+
+        private void SetCount() {
+            countText.text = $"Count: {_count}";
         }
 
         #region Button actions
@@ -276,6 +284,8 @@ namespace Script.Controller {
             }
 
             deletePanel.SetActive(false);
+            cameraBounds.Restart();
+            OnInputChanged(countText.text);
         }
 
         public void Click(int index) {
