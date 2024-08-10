@@ -51,7 +51,7 @@ namespace Script.Controller {
         }
 
         public void Back() {
-            AsyncLoad.Instance.Load(SceneNames.Preview); //TODO do not load again when going back
+            SceneLoadManager.Instance.ActivatePreviousScene();
         }
 
         public void Save() {

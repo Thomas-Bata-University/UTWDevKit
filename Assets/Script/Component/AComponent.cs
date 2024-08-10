@@ -1,3 +1,4 @@
+using Script.Utils;
 using UnityEngine;
 
 namespace Script.Component {
@@ -8,6 +9,7 @@ namespace Script.Component {
 
         protected Transform ObjectInstance; //Selected object of the component
         protected GameObject ComponentGrid;
+        protected GameObject Content;
 
         protected bool IsObjectMoving;
 
@@ -50,6 +52,7 @@ namespace Script.Component {
         public void Initialize(Transform objectInstance, GameObject componentGrid) {
             this.ObjectInstance = objectInstance;
             this.ComponentGrid = componentGrid;
+            this.Content = ComponentGridUtils.GetContent(ComponentGrid);
         }
 
     }

@@ -39,6 +39,7 @@ namespace Script.Log {
         }
 
         public void LogErrorMessage(string message, float duration = 3f) {
+            Debug.LogError(message);
             Message(message, duration, Color.red);
         }
 

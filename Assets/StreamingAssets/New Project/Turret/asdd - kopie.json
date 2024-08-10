@@ -1,0 +1,38 @@
+{
+    "projectName": "asdd",
+    "fileName": "asdd.json",
+    "ids": [
+        {
+            "type": 1,
+            "count": 2
+        }
+    ],
+    "cameraPos": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "cameraRot": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "items": [
+        {
+            "objectName": "Turret Variant_1",
+            "type": 1,
+            "position": {
+                "x": -0.34780120849609377,
+                "y": -0.6724158525466919,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "",
+            "Tag": "Turret"
+        }
+    ]
+}

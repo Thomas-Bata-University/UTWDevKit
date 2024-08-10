@@ -4,8 +4,6 @@ using Script.Enum;
 using Script.Static;
 using SimpleFileBrowser;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using Logger = Script.Log.Logger;
 
 namespace Script.Manager {
@@ -61,11 +59,10 @@ namespace Script.Manager {
 
                 CreateFolders(path);
 
-                AsyncLoad.Instance.Load(SceneNames.Preview);
+                SceneLoadManager.Instance.Load(SceneNames.Preview);
             }
             else {
                 Logger.Instance.LogErrorMessage("Project with this name already exists.");
-                Debug.LogError("Project with this name already exists.");
             }
         }
 
@@ -107,29 +104,46 @@ initialPath = Path.Combine(Application.dataPath, "StreamingAssets");
         }
 
         private void OnProjectOpen(string path) {
-            if (File.Exists(Path.Combine(path, ControlFile))) {
-                Debug.Log("Selected: " + path);
-                _projectPath = path;
+            if (!Validate(path)) return;
 
-                AsyncLoad.Instance.Load(SceneNames.Preview);
-            }
-            else {
-                Debug.LogError("Cannot open. This is not a UTW project.");
+            Debug.Log("Selected: " + path);
+            _projectPath = path;
+
+            SceneLoadManager.Instance.Load(SceneNames.Preview);
+        }
+
+        private bool Validate(string projectPath) {
+            if (!File.Exists(Path.Combine(projectPath, ControlFile))) {
                 Logger.Instance.LogErrorMessage("Cannot open. This is not a UTW project.");
+                return false;
             }
+
+            if (!Directory.Exists(GetActiveProjectFolder(TankPartType.HULL, projectPath))
+                || !Directory.Exists(GetActiveProjectFolder(TankPartType.TURRET, projectPath))
+                || !Directory.Exists(GetActiveProjectFolder(TankPartType.SUSPENSION, projectPath))
+                || !Directory.Exists(GetActiveProjectFolder(TankPartType.WEAPONRY, projectPath))
+                || !Directory.Exists(GetResourceFolder(GraphicFolder, projectPath))) {
+                Logger.Instance.LogErrorMessage("Cannot open. Wrong project directory format.");
+                return false;
+            }
+
+            return true;
         }
 
         #endregion
 
-        public string GetResourceFolder(string folder) {
-            return Path.Combine(_projectPath, ResourceFolder, folder);
+        public string GetResourceFolder(string folder, string projectPath = default) {
+            if (projectPath == default)
+                return Path.Combine(_projectPath, ResourceFolder, folder);
+
+            return Path.Combine(projectPath, ResourceFolder, folder);
         }
 
         public string GetActiveProjectFolder() {
             return GetActiveProjectFolder(partType);
         }
 
-        public string GetActiveProjectFolder(TankPartType partType) {
+        public string GetActiveProjectFolder(TankPartType partType, string projectPath = default) {
             string part;
             switch (partType) {
                 case TankPartType.HULL:
@@ -148,36 +162,10 @@ initialPath = Path.Combine(Application.dataPath, "StreamingAssets");
                     throw new Exception("Missing part type");
             }
 
-            return Path.Combine(_projectPath, part);
-        }
+            if (projectPath == default)
+                return Path.Combine(_projectPath, part);
 
-        public void MoveObjectToScene(string sceneName, GameObject objectToMove) {
-            //Destroy event system in previous scene
-            EventSystem existingEventSystem = FindObjectOfType<EventSystem>();
-            if (existingEventSystem != null) {
-                Debug.Log($"Destroyed {existingEventSystem.name}");
-                Destroy(existingEventSystem.gameObject);
-            }
-
-            //Destroy all audio listeners in previous scene
-            AudioListener[] audioListeners = FindObjectsOfType<AudioListener>();
-            if (audioListeners.Length > 0) {
-                for (int i = 0; i < audioListeners.Length; i++) {
-                    Debug.Log($"Destroyed {audioListeners[i].name}");
-                    Destroy(audioListeners[i].gameObject);
-                }
-            }
-
-            SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive).completed +=
-                asyncOperation => OnSceneLoaded(asyncOperation, sceneName, objectToMove);
-        }
-
-        private void OnSceneLoaded(AsyncOperation asyncOperation, string sceneName, GameObject objectToMove) {
-            Scene targetScene = SceneManager.GetSceneByName(sceneName);
-
-            SceneManager.MoveGameObjectToScene(objectToMove, targetScene);
-
-            SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene().name);
+            return Path.Combine(projectPath, part);
         }
 
     }

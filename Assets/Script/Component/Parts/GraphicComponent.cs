@@ -9,6 +9,7 @@ using Script.Mesh;
 using Script.Utils;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using Logger = Script.Log.Logger;
 
@@ -21,7 +22,7 @@ namespace Script.Component.Parts {
 
         //--------------------------------------------------------------------------------------------------------------------------
 
-        public static Action OnMeshChange;
+        public static UnityAction<Transform> OnMeshChange;
 
         public GameObject recordPrefab;
         private GameObject _selectedRecord;
@@ -100,7 +101,7 @@ namespace Script.Component.Parts {
             parent.name = "Graphic";
             parent.GetComponent<CombineMeshes>().Merge();
 
-            OnMeshChange?.Invoke();
+            OnMeshChange?.Invoke(ObjectInstance);
 
             SetMetadata(data.FilePath);
 
@@ -111,7 +112,7 @@ namespace Script.Component.Parts {
         }
 
         private void OnMeshLoad(string path, Transform objectInstance) {
-            OnMeshChange?.Invoke(); //Call to set canvas middle
+            OnMeshChange?.Invoke(objectInstance); //Call to set canvas middle
 
             if (String.IsNullOrEmpty(path) || ObjectInstance != objectInstance) {
                 return;

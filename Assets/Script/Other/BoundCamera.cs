@@ -1,3 +1,5 @@
+using System;
+using Script.Manager;
 using TMPro;
 using UnityEngine;
 
@@ -15,6 +17,8 @@ namespace Script.Other {
 
         private void Start() {
             _camera = GetComponent<Camera>();
+
+            SceneLoadManager.OnPreviousSceneLoad += Restart;
         }
 
         public Bounds GetTargetsBounds(Transform[] targets) {
@@ -43,6 +47,10 @@ namespace Script.Other {
         public void Restart() {
             info.SetActive(false);
             _camera.targetTexture.Release();
+        }
+
+        private void OnDestroy() {
+            SceneLoadManager.OnPreviousSceneLoad -= Restart;
         }
 
     }

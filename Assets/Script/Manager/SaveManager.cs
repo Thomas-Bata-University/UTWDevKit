@@ -25,6 +25,9 @@ namespace Script.Manager {
 
         public GameObject objectPrefab;
 
+        /// <summary>
+        /// KEY - File name without extension | VALUE - (KEY - Selectable | VALUE - Data about object)
+        /// </summary>
         public Dictionary<string, Dictionary<Transform, DataToSave>> Data = new();
         private DataList _dataList = new();
 
@@ -117,7 +120,7 @@ namespace Script.Manager {
 
                     GetData(Path.GetFileNameWithoutExtension(fullPath)).Add(selectable, MapData(data));
 
-                    Debug.Log($"Preloaded - {partType} - {Path.GetFileNameWithoutExtension(fullPath)}");
+                    Debug.Log($"Preloaded - {partType} - {Path.GetFileNameWithoutExtension(fullPath)} - {go.name}");
                 }
 
                 return parent;
@@ -148,7 +151,8 @@ namespace Script.Manager {
 
                 ComponentSO component = GetComponents(kvp.Value.type);
                 componentControl.CreateGridForObject(kvp.Key.parent, component.Initialize());
-                kvp.Key.parent.parent = null; //TODO maybe we can use parent
+                kvp.Key.parent.parent.gameObject.SetActive(true);
+
                 OnMeshLoad?.Invoke(kvp.Value.pathToGraphic, kvp.Key);
             }
         }

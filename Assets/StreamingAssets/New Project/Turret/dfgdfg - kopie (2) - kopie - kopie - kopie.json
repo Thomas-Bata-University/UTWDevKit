@@ -1,0 +1,134 @@
+{
+    "projectName": "dfgdfg - kopie (2) - kopie - kopie - kopie",
+    "fileName": "dfgdfg - kopie (2) - kopie - kopie - kopie.json",
+    "ids": [
+        {
+            "type": 1,
+            "count": 2
+        }
+    ],
+    "cameraPos": {
+        "x": 3.6271812915802,
+        "y": 6.846391677856445,
+        "z": -8.99064826965332
+    },
+    "cameraRot": {
+        "x": 21.80000114440918,
+        "y": 334.550048828125,
+        "z": 0.0000018390666127743316
+    },
+    "items": [
+        {
+            "objectName": "Hull Variant_1",
+            "type": 0,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "",
+            "Tag": "Hull"
+        },
+        {
+            "objectName": "Hull Variant_1",
+            "type": 0,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "",
+            "Tag": "Hull"
+        },
+        {
+            "objectName": "Hull Variant_1",
+            "type": 0,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "",
+            "Tag": "Hull"
+        },
+        {
+            "objectName": "Hull Variant_1",
+            "type": 0,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "",
+            "Tag": "Hull"
+        },
+        {
+            "objectName": "Hull Variant_1",
+            "type": 0,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "",
+            "Tag": "Hull"
+        },
+        {
+            "objectName": "Hull Variant_1",
+            "type": 0,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "",
+            "Tag": "Hull"
+        },
+        {
+            "objectName": "Turret Variant_1",
+            "type": 1,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "pathToGraphic": "",
+            "Tag": "Turret"
+        }
+    ]
+}

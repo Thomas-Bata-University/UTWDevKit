@@ -70,6 +70,12 @@ namespace Script.Component.Parts {
             SetCanvasMiddle();
         }
 
+        private void SetCanvasMiddle(Transform objectInstance) {
+            if (objectInstance != ObjectInstance) return;
+
+            SetCanvasMiddle();
+        }
+
         private void SetCanvasMiddle() {
             ObjectUtils.GetCanvas(ObjectInstance).transform.position = ObjectUtils.GetObjectCenter(ObjectInstance);
         }

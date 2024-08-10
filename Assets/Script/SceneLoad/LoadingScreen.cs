@@ -30,6 +30,11 @@ namespace Script.SceneLoad {
         }
 
         public void Show() {
+            hullText.text = null;
+            turretText.text = null;
+            suspensionText.text = null;
+            weaponryText.text = null;
+
             loadingScreen.SetActive(true);
         }
 
